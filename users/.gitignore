@@ -1,0 +1,4 @@
+*.odg
+venv
+**/*/.pytest_cache
+Pipfile.lock
