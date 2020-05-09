@@ -5,7 +5,7 @@ help:
 		| sort \
 		| awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-prepare-env: ## install the service's dependencies
+prepare-env: ## Install the service's dependencies
 	@echo -e "\e[1;34mmaking new virtual environment and installing dependencies ...\e[0m" && \
 		pipenv install
 
