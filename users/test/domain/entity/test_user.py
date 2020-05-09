@@ -1,5 +1,5 @@
 from src.domain.entity.failure import Failure
-from src.domain.entity.user import User
+from src.domain.entity.user import User, create_user
 
 
 def test_valid_user_creation():
@@ -9,7 +9,7 @@ def test_valid_user_creation():
     password: str = "StrongPassw0rd"
 
     # alpha name
-    assert User.create_user(
+    assert create_user(
         name=name,
         age=age,
         password=password,
@@ -22,7 +22,7 @@ def test_valid_user_creation():
     )
 
     # alpha numeric name
-    assert User.create_user(
+    assert create_user(
         name=name + "2",
         age=age,
         password=password,
@@ -42,7 +42,7 @@ def test_invalid_user_creation():
     password: str = "StrongPassw0rd"
 
     # empty name
-    assert User.create_user(
+    assert create_user(
         name="",
         age=age,
         password=password,
@@ -52,7 +52,7 @@ def test_invalid_user_creation():
                        "name should be alpha or alpha numeric.")
 
     # one char name
-    assert User.create_user(
+    assert create_user(
         name="a",
         age=age,
         password=password,
@@ -60,7 +60,7 @@ def test_invalid_user_creation():
     ) == Failure(error='name should be at least 2 characters.')
 
     # less than 16 age <just a number to have limit in the app :D>
-    assert User.create_user(
+    assert create_user(
         name=name,
         age=15,
         password=password,
@@ -68,7 +68,7 @@ def test_invalid_user_creation():
     ) == Failure(error='age should be between 16 and 150.')
 
     # more than 150 age <just a number to have limit in the app :D>
-    assert User.create_user(
+    assert create_user(
         name=name,
         age=151,
         password=password,
@@ -76,7 +76,7 @@ def test_invalid_user_creation():
     ) == Failure(error='age should be between 16 and 150.')
 
     # weak password
-    assert User.create_user(
+    assert create_user(
         name=name,
         age=26,
         password="weak",
@@ -84,7 +84,7 @@ def test_invalid_user_creation():
     ) == Failure(error='password should be stronger.')
 
     # invalid email
-    assert User.create_user(
+    assert create_user(
         name=name,
         age=26,
         password=password,
