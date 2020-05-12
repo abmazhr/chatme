@@ -4,7 +4,7 @@ from src.application.types import (
 )
 
 
-class DatabaseUser(NamedTuple):
+class ApplicationUser(NamedTuple):
     id: str
     name: str
     age: int
