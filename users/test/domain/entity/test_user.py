@@ -1,5 +1,5 @@
 from src.domain.entity.failure import Failure
-from src.domain.entity.user import User, create_user
+from src.domain.entity.user import DomainUser, create_user
 
 
 def test_valid_user_creation():
@@ -14,7 +14,7 @@ def test_valid_user_creation():
         age=age,
         password=password,
         email=email
-    ) == User(
+    ) == DomainUser(
         name=name,
         age=age,
         email=email,
@@ -27,7 +27,7 @@ def test_valid_user_creation():
         age=age,
         password=password,
         email=email
-    ) == User(
+    ) == DomainUser(
         name=name + "2",
         age=age,
         email=email,

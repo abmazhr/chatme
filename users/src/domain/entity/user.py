@@ -18,7 +18,7 @@ __email_pattern: Pattern[AnyStr] = compile(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[
 __password_pattern: Pattern[AnyStr] = compile(r"^(?=.{8,32}$)(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*")
 
 
-class User(NamedTuple):
+class DomainUser(NamedTuple):
     name: str
     age: int
     password: str
@@ -35,7 +35,7 @@ def create_user(*,
                 name: str,
                 age: int,
                 password: str,
-                email: Maybe[str]) -> Either[Failure, User]:
+                email: Maybe[str]) -> Either[Failure, DomainUser]:
     # simple validation
     results: List[Either[Failure, Success]] = list(map(
         __validate, (
@@ -78,7 +78,7 @@ def create_user(*,
 
     failures: List[Failure] = list(filter(lambda ins: isinstance(ins, Failure), results))
 
-    return User(
+    return DomainUser(
         name=name,
         age=age,
         password=password,
