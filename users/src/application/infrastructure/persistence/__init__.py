@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 
-from src.application.entity.database_user import DatabaseUser
+from src.application.entity.user import ApplicationUser
 from src.application.types import (
     Maybe,
     Either,
@@ -8,20 +8,20 @@ from src.application.types import (
 )
 from src.domain.entity.failure import Failure
 from src.domain.entity.success import Success
-from src.domain.entity.user import User as DomainUser
+from src.domain.entity.user import DomainUser as DomainUser
 
 
-class DatabaseInterface(metaclass=ABCMeta):
+class PersistenceInterface(metaclass=ABCMeta):
     # maybe having a better way of doing this later ;)
     class FetchBy:
         @abstractmethod
-        def id(self, *, user_id: str) -> Either[Failure, DatabaseUser]: pass
+        def id(self, *, user_id: str) -> Either[Failure, ApplicationUser]: pass
 
         @abstractmethod
-        def name(self, *, user_name: str) -> Either[Failure, DatabaseUser]: pass
+        def name(self, *, user_name: str) -> Either[Failure, ApplicationUser]: pass
 
         @abstractmethod
-        def email(self, *, user_email: str) -> Either[Failure, DatabaseUser]: pass
+        def email(self, *, user_email: str) -> Either[Failure, ApplicationUser]: pass
 
     class UpdateBy:
         @abstractmethod
@@ -50,8 +50,8 @@ class DatabaseInterface(metaclass=ABCMeta):
         self.delete_user_by = self._delete_user_by()
 
     @staticmethod
-    def from_domain_user_to_database_user(*, user: DomainUser, user_id: str) -> DatabaseUser:
-        return DatabaseUser(
+    def from_domain_user_to_database_user(*, user: DomainUser, user_id: str) -> ApplicationUser:
+        return ApplicationUser(
             id=user_id,
             name=user.name,
             age=user.age,
@@ -60,7 +60,7 @@ class DatabaseInterface(metaclass=ABCMeta):
         )
 
     @staticmethod
-    def from_database_user_to_domain_user(*, user: DatabaseUser) -> DomainUser:
+    def from_database_user_to_domain_user(*, user: ApplicationUser) -> DomainUser:
         return DomainUser(
             name=user.name,
             age=user.age,
@@ -69,13 +69,13 @@ class DatabaseInterface(metaclass=ABCMeta):
         )
 
     @abstractmethod
-    def persist_user(self, *, user: DomainUser) -> Either[Failure, DatabaseUser]: pass
+    def persist_user(self, *, user: DomainUser) -> Either[Failure, ApplicationUser]: pass
 
     @abstractmethod
-    def _fetch_user_by(self) -> 'DatabaseInterface.FetchBy': pass
+    def _fetch_user_by(self) -> 'PersistenceInterface.FetchBy': pass
 
     @abstractmethod
-    def _update_user_by(self) -> 'DatabaseInterface.UpdateBy': pass
+    def _update_user_by(self) -> 'PersistenceInterface.UpdateBy': pass
 
     @abstractmethod
-    def _delete_user_by(self) -> 'DatabaseInterface.DeleteBy': pass
+    def _delete_user_by(self) -> 'PersistenceInterface.DeleteBy': pass
