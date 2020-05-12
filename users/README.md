@@ -15,6 +15,7 @@ Here it's the service which is responsible of any user related actions which are
 # Usage
 
 - running `$ make` command on any of your terminals (Linux, Mac or Windows) # For all the possible commands currently available for the project
+
   ![current_make_list](current_make_list.png)
 
 # TODO
