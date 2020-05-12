@@ -18,7 +18,8 @@ run-tests-locally: prepare-env ## Running the service's tests locally
 			--cov . test \
 			--cov-report term-missing \
 			--cov-report html:cov_html \
-			--cov-report xml:cov.xml && \
+			--cov-report xml:cov.xml \
+			--cov-config .coveragerc && \
 		echo -e "\e[1;34mcleaning directory ...\e[0m" && \
 		rm -r ./.pytest_cache/ 2> /dev/null && \
 		rm ./.coverage 2> /dev/null
