@@ -1,10 +1,10 @@
 from pytest import fixture
 
+from src.application.entity.user import ApplicationUser
 from src.application.infrastructure.persistence.in_memory import InMemoryDatabase
 from src.application.usecase.user.add_user import AddUserUseCase
 from src.application.usecase.user.update_user import UpdateUserUseCase
 from src.domain.entity.failure import Failure
-from src.domain.entity.success import Success
 from src.domain.entity.user import DomainUser as DomainUser
 from src.domain.entity.user import create_user
 from test.utilities.user import generate_valid_domain_user
@@ -49,25 +49,34 @@ def test_valid_update_user(setup):
     )
 
     # by id
-    assert isinstance(usecase.execute(
+    assert usecase.execute(
         update_by_selector="id",
         update_by_data="0",
         updated_user=updated_domain_user
-    ), Success)
+    ) == ApplicationUser(
+        id="0",
+        **updated_domain_user._asdict()
+    )
 
     # by name
-    assert isinstance(usecase.execute(
+    assert usecase.execute(
         update_by_selector="name",
         update_by_data="test",
         updated_user=updated_domain_user
-    ), Success)
+    ) == ApplicationUser(
+        id="0",
+        **updated_domain_user._asdict()
+    )
 
     # by email
-    assert isinstance(usecase.execute(
+    assert usecase.execute(
         update_by_selector="email",
         update_by_data="test@test.com",
         updated_user=updated_domain_user
-    ), Success)
+    ) == ApplicationUser(
+        id="0",
+        **updated_domain_user._asdict()
+    )
 
 
 def test_invalid_update_user(setup):

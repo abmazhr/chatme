@@ -9,6 +9,10 @@ verify_ssl = true
 pytest = "*"
 coverage = "*"
 pytest-cov = "*"
+starlette = "*"
+uvicorn = "*"
+jsonschema = "*"
+requests = "*"
 
 [requires]
 python_version = "3.8"
