@@ -34,7 +34,7 @@ class UpdateUserUseCase(UseCaseInterface):
             "email": self.__persistence.update_user_by.email
         }
 
-        update_user_status: Either[Failure, Success] = selector_mapping[update_by_selector](
+        update_user_status: Either[Failure, ApplicationUser] = selector_mapping[update_by_selector](
             **{f"user_{update_by_selector}": update_by_data, "updated_user": updated_user}
         )
         return update_user_status
