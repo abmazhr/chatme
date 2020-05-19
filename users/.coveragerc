@@ -1,2 +1,2 @@
 [run]
-omit = venv/*, test/__init__.py, test/**/__init__.py
+omit = venv/*, test/__init__.py, test/**/__init__.py, src/application/infrastructure/web/rest_api/__init__.py

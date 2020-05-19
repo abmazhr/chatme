@@ -1,3 +1,4 @@
+from src.application.entity.health_check import HealthCheckStatus, Status
 from src.application.entity.user import ApplicationUser
 from src.application.infrastructure.persistence import PersistenceInterface
 from src.application.types import (
@@ -36,10 +37,25 @@ class InMemoryDatabase(PersistenceInterface):
         }
         """
 
+    def health_check(self) -> HealthCheckStatus:
+        try:
+            test_key = "TEST"
+            test_value = 0
+
+            self.__db[test_key] = test_value
+            assert self.__db[test_key] == test_value
+            del self.__db[test_key]
+
+            return HealthCheckStatus(service_name=self.__class__.__name__, service_state=Status.HEALTHY)
+        except Exception as ex:
+            return HealthCheckStatus(service_name=self.__class__.__name__, service_state=Status.UNHEALTHY)
+
     # maybe later will modularize the functions in modules to be easier to maintain ;)
 
     @exception_handler
     def persist_user(self, *, user: DomainUser) -> Either[Failure, ApplicationUser]:
+        if self.__db["names"].get(user.name, None) is not None:
+            return Failure(error=f"Username {user.name} is already exist, please use a different name.")
         persisted_user = PersistenceInterface.from_domain_user_to_database_user(
             user=user,
             user_id=str(self.__last_id)
@@ -88,7 +104,7 @@ class InMemoryDatabase(PersistenceInterface):
 
         class InMemoryUpdateBy(PersistenceInterface.UpdateBy):
             @exception_handler
-            def id(self, *, user_id: str, updated_user: DomainUser) -> Either[Failure, Success]:
+            def id(self, *, user_id: str, updated_user: DomainUser) -> Either[Failure, ApplicationUser]:
                 fetch_status: Maybe[ApplicationUser] = db["ids"].get(user_id)
                 if isinstance(fetch_status, ApplicationUser):
                     db["ids"][fetch_status.id] = PersistenceInterface.from_domain_user_to_database_user(
@@ -96,11 +112,11 @@ class InMemoryDatabase(PersistenceInterface):
                         user_id=fetch_status.id
                     )
 
-                    return Success()
+                    return db["ids"][fetch_status.id]
 
                 return Failure(error=f"There is no user with id {user_id} to be updated")
 
-            def name(self, *, user_name: str, updated_user: DomainUser) -> Either[Failure, Success]:
+            def name(self, *, user_name: str, updated_user: DomainUser) -> Either[Failure, ApplicationUser]:
                 user_id: Maybe[str] = db["names"].get(user_name)
                 if user_id is not None:
                     db["ids"][user_id] = PersistenceInterface.from_domain_user_to_database_user(
@@ -108,11 +124,11 @@ class InMemoryDatabase(PersistenceInterface):
                         user_id=user_id
                     )
 
-                    return Success()
+                    return db["ids"][user_id]
 
                 return Failure(error=f"There is no user with name {user_name} to be updated")
 
-            def email(self, *, user_email: str, updated_user: DomainUser) -> Either[Failure, Success]:
+            def email(self, *, user_email: str, updated_user: DomainUser) -> Either[Failure, ApplicationUser]:
                 user_id: Maybe[str] = db["emails"].get(user_email)
                 if user_id is not None:
                     db["ids"][user_id] = PersistenceInterface.from_domain_user_to_database_user(
@@ -120,7 +136,7 @@ class InMemoryDatabase(PersistenceInterface):
                         user_id=user_id
                     )
 
-                    return Success()
+                    return db["ids"][user_id]
 
                 return Failure(error=f"There is no user with email {user_email} to be updated")
 
@@ -166,7 +182,3 @@ class InMemoryDatabase(PersistenceInterface):
                 return Failure(error=f"There is no user with email {user_email} to be deleted")
 
         return InMemoryDeleteBy()
-
-
-db = InMemoryDatabase(config=None)
-print(db)

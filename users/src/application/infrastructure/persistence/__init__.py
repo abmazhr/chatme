@@ -1,5 +1,6 @@
 from abc import ABCMeta, abstractmethod
 
+from src.application.entity.health_check import HealthCheckStatus
 from src.application.entity.user import ApplicationUser
 from src.application.types import (
     Maybe,
@@ -25,13 +26,13 @@ class PersistenceInterface(metaclass=ABCMeta):
 
     class UpdateBy:
         @abstractmethod
-        def id(self, *, user_id: str, updated_user: DomainUser) -> Either[Failure, Success]: pass
+        def id(self, *, user_id: str, updated_user: DomainUser) -> Either[Failure, ApplicationUser]: pass
 
         @abstractmethod
-        def name(self, *, user_name: str, updated_user: DomainUser) -> Either[Failure, Success]: pass
+        def name(self, *, user_name: str, updated_user: DomainUser) -> Either[Failure, ApplicationUser]: pass
 
         @abstractmethod
-        def email(self, *, user_email: str, updated_user: DomainUser) -> Either[Failure, Success]: pass
+        def email(self, *, user_email: str, updated_user: DomainUser) -> Either[Failure, ApplicationUser]: pass
 
     class DeleteBy:
         @abstractmethod
@@ -79,3 +80,6 @@ class PersistenceInterface(metaclass=ABCMeta):
 
     @abstractmethod
     def _delete_user_by(self) -> 'PersistenceInterface.DeleteBy': pass
+
+    @abstractmethod
+    def health_check(self) -> HealthCheckStatus: pass

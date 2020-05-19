@@ -1,2 +1,2 @@
 class Success:
-    pass
+    def _asdict(self): return {"status": "ok"}
