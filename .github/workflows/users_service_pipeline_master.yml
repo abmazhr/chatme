@@ -22,16 +22,9 @@ jobs:
         python-version: 3.8
     - name: Install dependencies
       run: |
-        cd users
         python -m pip install --upgrade pip
         pip install pipenv
-        pipenv --version 
-    - name: Lint with flake8
-      run: |
-        cd users
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        cd users && pipenv install 
     - name: Test with pytest
       run: |
-        cd users
-        make run-tests-locally
+        cd users && make run-tests-locally
