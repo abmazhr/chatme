@@ -22,3 +22,7 @@ Here it's the service which is responsible of any user related actions which are
 - [x] Architecture diagram of the service.
 - [ ] Good generated swagger documentation for any contained API.
 - [ ] Good generated documentation about how to setup/build and run the service with it's dependencies.
+
+# GITHUB-BUILD-STATUS
+
+![Python application](https://github.com/abmazhr/chatme/workflows/Python%20application/badge.svg?branch=master)
