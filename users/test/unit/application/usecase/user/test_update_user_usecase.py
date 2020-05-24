@@ -55,7 +55,7 @@ def test_valid_update_user(setup):
         updated_user=updated_domain_user
     ) == ApplicationUser(
         id="0",
-        **updated_domain_user._asdict()
+        **updated_domain_user.as_dict()
     )
 
     # by name
@@ -65,7 +65,7 @@ def test_valid_update_user(setup):
         updated_user=updated_domain_user
     ) == ApplicationUser(
         id="0",
-        **updated_domain_user._asdict()
+        **updated_domain_user.as_dict()
     )
 
     # by email
@@ -75,7 +75,7 @@ def test_valid_update_user(setup):
         updated_user=updated_domain_user
     ) == ApplicationUser(
         id="0",
-        **updated_domain_user._asdict()
+        **updated_domain_user.as_dict()
     )
 
 

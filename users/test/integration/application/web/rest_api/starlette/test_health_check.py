@@ -13,8 +13,12 @@ def setup():
     db = InMemoryDatabase(
         config=None
     )
+    host = "0.0.0.0"
+    port = 3000
     api = StarletteRestApi(
         config=None,
+        host=host,
+        port=port,
         routes=[
             Route(
                 url="/health",
