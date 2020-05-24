@@ -4,3 +4,4 @@ venv
 Pipfile.lock
 cov_html
 cov.xml
+**/open_api.yaml
