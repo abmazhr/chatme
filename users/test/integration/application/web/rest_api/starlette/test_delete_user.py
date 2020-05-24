@@ -6,7 +6,6 @@ from src.application.infrastructure.web.entity.route import Route
 from src.application.infrastructure.web.rest_api.starlette import StarletteRestApi
 from src.application.usecase.user.delete_user import DeleteUserUseCase
 from src.domain.entity.success import Success
-from src.domain.entity.user import DomainUser
 from test.utilities.user import generate_valid_domain_user
 
 
@@ -15,9 +14,12 @@ def setup():
     db = InMemoryDatabase(
         config=None
     )
-
+    host = "0.0.0.0"
+    port = 3000
     api = StarletteRestApi(
         config=None,
+        host=host,
+        port=port,
         routes=[
             Route(
                 url="/users",
@@ -52,21 +54,21 @@ def test_valid_delete_user(setup):
     dummy_id = "0"
     assert api.delete(
         url=f"/users?id={dummy_id}",
-    ).json() == Success()._asdict()
+    ).json() == Success().as_dict()
 
     # by name
     db.persist_user(user=domain_user)
     dummy_name = domain_user.name
     assert api.delete(
         url=f"/users?name={dummy_name}",
-    ).json() == Success()._asdict()
+    ).json() == Success().as_dict()
 
     # by email
     db.persist_user(user=domain_user)
     dummy_email = domain_user.email
     assert api.delete(
         url=f"/users?email={dummy_email}",
-    ).json() == Success()._asdict()
+    ).json() == Success().as_dict()
 
 
 def test_invalid_delete_user(setup):

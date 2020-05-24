@@ -17,9 +17,12 @@ def setup():
     )
     domain_user = generate_valid_domain_user()
     db.persist_user(user=domain_user)
-
+    host = "0.0.0.0"
+    port = 3000
     api = StarletteRestApi(
         config=None,
+        host=host,
+        port=port,
         routes=[
             Route(
                 url="/users",
@@ -46,7 +49,7 @@ def test_valid_get_user(setup):
     api: TestClient
     domain_user: DomainUser
 
-    user_json = UserJson(id="0", name=domain_user.name, age=domain_user.age, email=domain_user.email)._asdict()
+    user_json = UserJson(id="0", name=domain_user.name, age=domain_user.age, email=domain_user.email).as_dict()
 
     dummy_id = "0"
     assert api.get(

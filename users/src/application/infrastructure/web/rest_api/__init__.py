@@ -22,17 +22,30 @@ class RestApiInterface(metaclass=ABCMeta):
     @abstractmethod
     def __init__(self, *,
                  config: Maybe[SimpleConfig],
+                 host: str,
+                 port: int,
                  routes: List[Route]) -> None:
         self.register_endpoints(routes=routes)
+        self.register_generated_openid_docs(host=host, port=port)
 
     @abstractmethod
     def register_endpoints(self, *, routes: List[Route]) -> None: pass
+
+    @abstractmethod
+    def register_generated_openid_docs(self, *, host: str, port: int) -> None: pass
 
     @classmethod
     @abstractmethod
     def health_check(cls, *, services: List[Service]) -> Callable[..., JsonEntity.of(_type=_A)]:
         @abstractmethod
         def wrapper(*args, **kwargs) -> JsonEntity.of(_type=_A): pass
+
+        return wrapper
+
+    @abstractmethod
+    def open_api_schema(self) -> Callable[..., Any]:
+        @abstractmethod
+        def wrapper(*args, **kwargs) -> Any: pass
 
         return wrapper
 

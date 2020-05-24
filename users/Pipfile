@@ -13,6 +13,11 @@ starlette = "*"
 uvicorn = "*"
 jsonschema = "*"
 requests = "*"
+pyyaml = "*"
+swagger-ui-py = "*"
+starlette-apispec = "*"
+aiofiles = "*"
+marshmallow-dataclass = "*"
 
 [requires]
 python_version = "3.8"

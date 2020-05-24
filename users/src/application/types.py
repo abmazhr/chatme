@@ -10,5 +10,6 @@ from typing import (
     TypeVar,
 )
 from enum import Enum
+from dataclasses import dataclass, field
 
 SimpleConfig = Dict[str, Any]

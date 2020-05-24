@@ -5,6 +5,9 @@ from typing import (
     Callable,
     NamedTuple,
     List,
+    Dict,
     Pattern,
     AnyStr
 )
+
+from dataclasses import dataclass

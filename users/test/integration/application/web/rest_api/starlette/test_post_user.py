@@ -17,8 +17,12 @@ def setup():
     db = InMemoryDatabase(
         config=None
     )
+    host = "0.0.0.0"
+    port = 3000
     api = StarletteRestApi(
         config=None,
+        host=host,
+        port=port,
         routes=[
             Route(
                 url="/users",
@@ -58,7 +62,7 @@ def test_valid_add_user(setup):
             "password": domain_user.password,
             "email": domain_user.email
         }
-    ).json() == UserJson(id="0", name=domain_user.name, age=domain_user.age, email=domain_user.email)._asdict()
+    ).json() == UserJson(id="0", name=domain_user.name, age=domain_user.age, email=domain_user.email).as_dict()
 
     assert api.post(
         url="/users",
