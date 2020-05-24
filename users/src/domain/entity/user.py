@@ -1,5 +1,7 @@
 from re import compile
 
+import marshmallow_dataclass
+
 from src.domain.entity.failure import Failure
 from src.domain.entity.success import Success
 from src.domain.types import (
@@ -10,7 +12,9 @@ from src.domain.types import (
     NamedTuple,
     Pattern,
     AnyStr,
-    List
+    List,
+    Dict,
+    dataclass
 )
 
 # simple regex for now ;)
@@ -18,11 +22,25 @@ __email_pattern: Pattern[AnyStr] = compile(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[
 __password_pattern: Pattern[AnyStr] = compile(r"^(?=.{8,32}$)(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*")
 
 
-class DomainUser(NamedTuple):
+@dataclass(frozen=True)
+class DomainUser:
     name: str
     age: int
     password: str
     email: Maybe[str]
+
+    def as_dict(self) -> Dict[str, Any]:
+        return dict(
+            name=self.name,
+            age=self.age,
+            password=self.password,
+            email=self.email
+        )
+
+
+# compatibility with marshmallow serialization
+# maybe making it better later ;)
+marshmallow_dataclass.class_schema(DomainUser)
 
 
 class __VContainer(NamedTuple):

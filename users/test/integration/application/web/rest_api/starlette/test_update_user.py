@@ -1,10 +1,10 @@
 from pytest import fixture
 from starlette.testclient import TestClient
 
+from src.application.infrastructure.web.rest_api.starlette import StarletteRestApi
 from src.application.infrastructure.persistence.in_memory import InMemoryDatabase
 from src.application.infrastructure.web.entity.route import Route
 from src.application.infrastructure.web.entity.user_json import UserJson
-from src.application.infrastructure.web.rest_api.starlette import StarletteRestApi
 from src.application.infrastructure.web.schema.json.user.put_user import put_user
 from src.application.infrastructure.web.validation.jsonschema import JsonSchemaValidator
 from src.application.usecase.user.update_user import UpdateUserUseCase
@@ -19,9 +19,13 @@ def setup():
     )
     domain_user = generate_valid_domain_user()
     db.persist_user(user=domain_user)
+    host = "0.0.0.0"
+    port = 3000
 
     api = StarletteRestApi(
         config=None,
+        host=host,
+        port=port,
         routes=[
             Route(
                 url="/users",
@@ -64,13 +68,13 @@ def test_valid_update_user(setup):
         name=updated_domain_user.name,
         age=updated_domain_user.age,
         email=updated_domain_user.email
-    )._asdict()
+    ).as_dict()
 
     dummy_id = "0"
     assert api.put(
         url="/users",
         json={
-            'updated_user': updated_domain_user._asdict(),
+            'updated_user': updated_domain_user.as_dict(),
             'update_by_selector': 'id',
             'update_by_data': dummy_id
         }

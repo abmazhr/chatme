@@ -1,2 +1,2 @@
 class Success:
-    def _asdict(self): return {"status": "ok"}
+    def as_dict(self): return {"status": "ok"}
