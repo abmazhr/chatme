@@ -10,6 +10,7 @@ The architecture of the service is done some how close to the [clean_architectur
 ![clean_architecture](clean_architecture_diagram.svg)
 
 **`REST-API Diagram`**
+
 ![architecture_diagram](architecture_diagram.svg)
 
 # Required tools to be up and running
@@ -19,10 +20,9 @@ The architecture of the service is done some how close to the [clean_architectur
 - [make](https://www.gnu.org/software/make/) # as building/scripting tool
 
 # Usage
-
 - running `$ make` command on any of your terminals (Linux, Mac or Windows) # For all the possible commands currently available for the project
 
-  ![current_make_list](current_make_list.png)
+![current_make_list](current_make_list.png)
 
 # TODO
 - [x] Architecture diagram of the service.
