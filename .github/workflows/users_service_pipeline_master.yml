@@ -27,4 +27,4 @@ jobs:
         cd users && pipenv install 
     - name: Test with pytest
       run: |
-        cd users && make run-tests-locally
+        cd users && make run-tests-native-locally
