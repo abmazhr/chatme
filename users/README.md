@@ -4,7 +4,7 @@ Here it's the service which is responsible of any user related actions which are
 - Login.
 
 # ARCHITECTURE
-`**System Architecture**`
+**`System Architecture`**
 
 The architecture of the service is done some how close to the [clean_architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) by uncle bob.
 ![clean_architecture](clean_architecture_diagram.svg)
