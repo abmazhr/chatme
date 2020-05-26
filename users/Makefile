@@ -10,8 +10,8 @@ prepare-env: ## Install the service's dependencies
 		pipenv install
 
 
-run-tests-locally: prepare-env ## Running the service's tests locally
-	@echo -e "\e[1;34mrunning tests locally ...\e[0m" && \
+run-tests-native-locally: prepare-env ## Running the service's tests natively locally
+	@echo -e "\e[1;34mrunning tests native locally ...\e[0m" && \
 		pipenv run py.test \
 			-r s \
 			-vvs \
@@ -23,3 +23,8 @@ run-tests-locally: prepare-env ## Running the service's tests locally
 		echo -e "\e[1;34mcleaning directory ...\e[0m" && \
 		rm -r ./.pytest_cache/ 2> /dev/null && \
 		rm ./.coverage 2> /dev/null
+
+run-server-native-locally: prepare-env ## Running the service's server natively locally
+	@echo -e "\e[1;34mrunning server native locally ...\e[0m" && \
+		echo -e "\e[1;33mTo exit press CTRL+C ...\e[0m" && \
+		pipenv run python src/main.py
