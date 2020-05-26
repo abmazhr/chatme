@@ -1,19 +1,19 @@
 import os
 import sys
 
-from application.entity.service import Service
-from application.infrastructure.persistence.in_memory import InMemoryDatabase
-from application.infrastructure.web.entity.route import Route
-from application.infrastructure.web.rest_api.starlette import StarletteRestApi
-from application.infrastructure.web.schema.json.user.post_user import post_user
-from application.infrastructure.web.schema.json.user.put_user import put_user
-from application.infrastructure.web.validation.jsonschema import JsonSchemaValidator
-from application.usecase.user.add_user import AddUserUseCase
-from application.usecase.user.delete_user import DeleteUserUseCase
-from application.usecase.user.fetch_user import FetchUserUseCase
-from application.usecase.user.update_user import UpdateUserUseCase
-
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+
+from src.application.entity.service import Service
+from src.application.infrastructure.persistence.in_memory import InMemoryDatabase
+from src.application.infrastructure.web.entity.route import Route
+from src.application.infrastructure.web.rest_api.starlette import StarletteRestApi
+from src.application.infrastructure.web.schema.json.user.post_user import post_user
+from src.application.infrastructure.web.schema.json.user.put_user import put_user
+from src.application.infrastructure.web.validation.jsonschema import JsonSchemaValidator
+from src.application.usecase.user.add_user import AddUserUseCase
+from src.application.usecase.user.delete_user import DeleteUserUseCase
+from src.application.usecase.user.fetch_user import FetchUserUseCase
+from src.application.usecase.user.update_user import UpdateUserUseCase
 
 db = InMemoryDatabase(config=None)
 
