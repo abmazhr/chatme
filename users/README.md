@@ -11,6 +11,7 @@ The architecture of the service is done some how close to the [clean_architectur
 
 **`REST-API Diagram`**
 
+generated open-api/swagger docs can be found at `"/swagger.io/docs"`
 ![architecture_diagram](architecture_diagram.svg)
 
 # Required tools to be up and running
