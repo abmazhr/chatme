@@ -366,6 +366,7 @@ class StarletteRestApi(RestApiInterface):
         return wrapper
 
     def run(self, *, host: str, port: int, debug: bool, workers: int) -> None:
+        print(f"SERVICE-API documentation can be found on http://{host}:{port}/swagger.io/docs")
         uvicorn.run(
             self.__app,
             host=host,

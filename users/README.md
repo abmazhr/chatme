@@ -27,7 +27,7 @@ The architecture of the service is done some how close to the [clean_architectur
 # TODO
 - [x] Architecture diagram of the service.
 - [x] Good generated swagger documentation for any contained API.
-- [ ] Good generated documentation about how to setup/build and run the service with it's dependencies.
+- [x] Good generated documentation about how to setup/build and run the service with it's dependencies.
 
 # GITHUB-BUILD-STATUS
 
