@@ -1,0 +1,10 @@
+test
+*.odg
+*.png
+*.svg
+cov_html
+cov.xml
+.gitignore
+.coveragerc
+Pipfile.lock
+*.md
