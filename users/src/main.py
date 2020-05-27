@@ -1,6 +1,9 @@
 import os
 import sys
 
+from application.infrastructure.web.schema.json.user.login_user import login_user
+from application.usecase.user.add_access_token import AddAccessTokenUseCase
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
 from src.application.entity.service import Service
@@ -22,6 +25,22 @@ StarletteRestApi(
     host="0.0.0.0",
     port=3000,
     routes=[
+        Route(
+            url="/users/login",
+            methods=["POST"],
+            handler=StarletteRestApi.get_access_token,
+            args=None,
+            kwargs=dict(
+                add_access_token_usecase=AddAccessTokenUseCase(
+                    config=None,
+                    persistence=db
+                ),
+                json_schema=login_user,
+                json_schema_validator=JsonSchemaValidator(
+                    config=None
+                )
+            )
+        ),
         Route(
             url="/users",
             methods=["GET"],

@@ -1,5 +1,6 @@
 from abc import ABCMeta, abstractmethod
 
+from src.application.usecase.user.add_access_token import AddAccessTokenUseCase
 from src.application.entity.service import Service
 from src.application.infrastructure.web.entity.json import _A, JsonEntity
 from src.application.infrastructure.web.entity.route import Route
@@ -46,6 +47,17 @@ class RestApiInterface(metaclass=ABCMeta):
     def open_api_schema(self) -> Callable[..., Any]:
         @abstractmethod
         def wrapper(*args, **kwargs) -> Any: pass
+
+        return wrapper
+
+    @classmethod
+    @abstractmethod
+    def get_access_token(cls, *,
+                         add_access_token_usecase: AddAccessTokenUseCase,
+                         json_schema: Dict[str, Any],
+                         json_schema_validator: JsonValidatorInterface) -> Callable[..., JsonEntity.of(_type=_A)]:
+        @abstractmethod
+        def wrapper(*args, **kwargs) -> JsonEntity.of(_type=_A): pass
 
         return wrapper
 

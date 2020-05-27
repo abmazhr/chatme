@@ -22,7 +22,7 @@ class DeleteUserUseCase(UseCaseInterface):
     @exception_handler
     def execute(self, *,
                 delete_by_selector: str,
-                delete_by_data: str) -> Either[Failure, ApplicationUser]:
+                delete_by_data: str) -> Either[Failure, Success]:
         if delete_by_selector not in _delete_selectors:
             return Failure(error=f"Delete selector should be within this list {_delete_selectors}")
 
