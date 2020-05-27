@@ -8,7 +8,7 @@ from src.application.infrastructure.web.rest_api.starlette import StarletteRestA
 from src.application.infrastructure.web.schema.json.user.post_user import post_user
 from src.application.infrastructure.web.validation.jsonschema import JsonSchemaValidator
 from src.application.usecase.user.add_user import AddUserUseCase
-from src.domain.entity.user import DomainUser
+from src.domain.entity.user import DomainUser, UserRole
 from test.utilities.user import generate_valid_domain_user
 
 
@@ -62,7 +62,13 @@ def test_valid_add_user(setup):
             "password": domain_user.password,
             "email": domain_user.email
         }
-    ).json() == UserJson(id="0", name=domain_user.name, age=domain_user.age, email=domain_user.email).as_dict()
+    ).json() == UserJson(
+        id="0",
+        name=domain_user.name,
+        age=domain_user.age,
+        email=domain_user.email,
+        role=domain_user.role
+    ).as_dict()
 
     assert api.post(
         url="/users",

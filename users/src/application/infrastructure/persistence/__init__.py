@@ -57,7 +57,8 @@ class PersistenceInterface(metaclass=ABCMeta):
             name=user.name,
             age=user.age,
             email=user.email,
-            password=user.password
+            password=user.password,
+            role=user.role
         )
 
     @staticmethod
@@ -66,7 +67,8 @@ class PersistenceInterface(metaclass=ABCMeta):
             name=user.name,
             age=user.age,
             email=user.email,
-            password=user.password
+            password=user.password,
+            role=user.role
         )
 
     @abstractmethod

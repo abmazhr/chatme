@@ -28,7 +28,8 @@ def setup():
         username=created_domain_user.name,
         age=created_domain_user.age,
         password=created_domain_user.password,
-        email=created_domain_user.email
+        email=created_domain_user.email,
+        role=created_domain_user.role
     )
 
     yield add_usecase, delete_usecase, created_domain_user
@@ -51,7 +52,8 @@ def test_valid_delete_user(setup):
         username=created_domain_user.name,
         age=created_domain_user.age,
         password=created_domain_user.password,
-        email=created_domain_user.email
+        email=created_domain_user.email,
+        role=created_domain_user.role
     )
 
     # by name
@@ -64,7 +66,8 @@ def test_valid_delete_user(setup):
         username=created_domain_user.name,
         age=created_domain_user.age,
         password=created_domain_user.password,
-        email=created_domain_user.email
+        email=created_domain_user.email,
+        role=created_domain_user.role
     )
 
     # by email

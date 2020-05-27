@@ -4,7 +4,7 @@ from src.application.infrastructure.persistence import PersistenceInterface
 from src.application.infrastructure.persistence.in_memory import InMemoryDatabase
 from src.application.usecase.user.add_user import AddUserUseCase
 from src.domain.entity.failure import Failure
-from src.domain.entity.user import DomainUser
+from src.domain.entity.user import DomainUser, UserRole
 from test.utilities.user import generate_valid_domain_user
 
 
@@ -29,7 +29,8 @@ def test_valid_add_user(setup):
         username=generated_domain_user.name,
         age=generated_domain_user.age,
         password=generated_domain_user.password,
-        email=generated_domain_user.email
+        email=generated_domain_user.email,
+        role=generated_domain_user.role
     ) == PersistenceInterface.from_domain_user_to_database_user(
         user=generated_domain_user,
         user_id="0"
@@ -41,6 +42,7 @@ def test_invalid_add_user(setup):
     age = 26
     password = "weak_password"
     email = "test@test.com"
+    role = UserRole.USER
 
     usecase: AddUserUseCase = setup
     # other variety of invalid data is covered on the user_tests itself
@@ -48,5 +50,6 @@ def test_invalid_add_user(setup):
         username=name,
         age=age,
         password=password,
-        email=email
+        email=email,
+        role=role
     ) == Failure(error='password should be stronger.')

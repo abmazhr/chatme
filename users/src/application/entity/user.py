@@ -1,5 +1,6 @@
 import marshmallow_dataclass
 
+from src.domain.entity.user import UserRole
 from src.application.types import (
     Maybe,
     dataclass,
@@ -15,6 +16,7 @@ class ApplicationUser:
     age: int
     email: Maybe[str]
     password: str
+    role: UserRole
 
     def as_dict(self) -> Dict[str, Any]:
         return dict(
@@ -22,7 +24,8 @@ class ApplicationUser:
             name=self.name,
             age=self.age,
             email=self.email,
-            password=self.password
+            password=self.password,
+            role=self.role.name
         )
 
 

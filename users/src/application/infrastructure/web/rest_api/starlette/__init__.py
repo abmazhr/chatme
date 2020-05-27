@@ -12,7 +12,6 @@ from starlette.responses import JSONResponse
 from starlette_apispec import APISpecSchemaGenerator
 from swagger_ui import api_doc
 
-from src.application.utilities.functions import exception_handler
 from src.application.entity.service import Service
 from src.application.entity.user import ApplicationUser
 from src.application.infrastructure.web.entity.json import JsonEntity, _A
@@ -32,10 +31,11 @@ from src.application.usecase.user.add_user import AddUserUseCase
 from src.application.usecase.user.delete_user import DeleteUserUseCase
 from src.application.usecase.user.fetch_user import FetchUserUseCase
 from src.application.usecase.user.update_user import UpdateUserUseCase
+from src.application.utilities.functions import exception_handler
 from src.application.utilities.user import from_application_user_to_json_user
 from src.domain.entity.failure import Failure
 from src.domain.entity.success import Success
-from src.domain.entity.user import create_user, DomainUser
+from src.domain.entity.user import create_user, DomainUser, UserRole
 
 
 class StarletteRestApi(RestApiInterface):
@@ -172,7 +172,8 @@ class StarletteRestApi(RestApiInterface):
                     username=json_data["name"],
                     age=json_data["age"],
                     password=json_data["password"],
-                    email=json_data.get("email", None)
+                    email=json_data.get("email", None),
+                    role=UserRole.USER
                 )
                 if isinstance(add_user_status, ApplicationUser):
                     user_json: UserJson = from_application_user_to_json_user(
@@ -288,6 +289,8 @@ class StarletteRestApi(RestApiInterface):
                 data=json_data
             )
             if isinstance(json_validation_status, Success):
+                # will make this better later ;)
+                json_data["updated_user"]["role"] = UserRole.USER
                 create_domain_user_status = create_user(
                     **json_data["updated_user"]
                 )

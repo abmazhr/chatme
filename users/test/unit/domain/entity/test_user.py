@@ -1,5 +1,5 @@
 from src.domain.entity.failure import Failure
-from src.domain.entity.user import DomainUser, create_user
+from src.domain.entity.user import DomainUser, create_user, UserRole
 
 
 def test_valid_user_creation():
@@ -13,12 +13,14 @@ def test_valid_user_creation():
         name=name,
         age=age,
         password=password,
-        email=email
+        email=email,
+        role=UserRole.USER
     ) == DomainUser(
         name=name,
         age=age,
         email=email,
-        password=password  # for now but later will be encrypted
+        password=password,  # for now but later will be encrypted
+        role=UserRole.USER
     )
 
     # alpha numeric name
@@ -26,12 +28,14 @@ def test_valid_user_creation():
         name=name + "2",
         age=age,
         password=password,
-        email=email
+        email=email,
+        role=UserRole.USER
     ) == DomainUser(
         name=name + "2",
         age=age,
         email=email,
-        password=password  # for now but later will be encrypted
+        password=password,  # for now but later will be encrypted
+        role=UserRole.USER
     )
 
 
@@ -46,7 +50,8 @@ def test_invalid_user_creation():
         name="",
         age=age,
         password=password,
-        email=email
+        email=email,
+        role=UserRole.USER
     ) == Failure(error="name can't be empty.\n"
                        "name should be at least 2 characters.\n"
                        "name should be alpha or alpha numeric.")
@@ -56,7 +61,8 @@ def test_invalid_user_creation():
         name="a",
         age=age,
         password=password,
-        email=email
+        email=email,
+        role=UserRole.USER
     ) == Failure(error='name should be at least 2 characters.')
 
     # less than 16 age <just a number to have limit in the app :D>
@@ -64,7 +70,8 @@ def test_invalid_user_creation():
         name=name,
         age=15,
         password=password,
-        email=email
+        email=email,
+        role=UserRole.USER
     ) == Failure(error='age should be between 16 and 150.')
 
     # more than 150 age <just a number to have limit in the app :D>
@@ -72,7 +79,8 @@ def test_invalid_user_creation():
         name=name,
         age=151,
         password=password,
-        email=email
+        email=email,
+        role=UserRole.USER
     ) == Failure(error='age should be between 16 and 150.')
 
     # weak password
@@ -80,7 +88,8 @@ def test_invalid_user_creation():
         name=name,
         age=26,
         password="weak",
-        email=email
+        email=email,
+        role=UserRole.USER
     ) == Failure(error='password should be stronger.')
 
     # invalid email
@@ -88,5 +97,6 @@ def test_invalid_user_creation():
         name=name,
         age=26,
         password=password,
-        email="invalid_email"
+        email="invalid_email",
+        role=UserRole.USER
     ) == Failure(error='email should be a valid one.')

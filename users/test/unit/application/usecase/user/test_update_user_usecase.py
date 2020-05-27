@@ -29,7 +29,8 @@ def setup():
         username=created_domain_user.name,
         age=created_domain_user.age,
         password=created_domain_user.password,
-        email=created_domain_user.email
+        email=created_domain_user.email,
+        role=created_domain_user.role
     )
 
     yield update_usecase, created_domain_user
@@ -45,7 +46,8 @@ def test_valid_update_user(setup):
         name="newname",
         age=created_domain_user.age + 10,
         password=created_domain_user.password,
-        email=created_domain_user.email
+        email=created_domain_user.email,
+        role=created_domain_user.role
     )
 
     # by id
@@ -55,7 +57,11 @@ def test_valid_update_user(setup):
         updated_user=updated_domain_user
     ) == ApplicationUser(
         id="0",
-        **updated_domain_user.as_dict()
+        name=updated_domain_user.name,
+        age=updated_domain_user.age,
+        email=updated_domain_user.email,
+        password=updated_domain_user.password,
+        role=updated_domain_user.role
     )
 
     # by name
@@ -65,7 +71,11 @@ def test_valid_update_user(setup):
         updated_user=updated_domain_user
     ) == ApplicationUser(
         id="0",
-        **updated_domain_user.as_dict()
+        name=updated_domain_user.name,
+        age=updated_domain_user.age,
+        email=updated_domain_user.email,
+        password=updated_domain_user.password,
+        role=updated_domain_user.role
     )
 
     # by email
@@ -75,7 +85,11 @@ def test_valid_update_user(setup):
         updated_user=updated_domain_user
     ) == ApplicationUser(
         id="0",
-        **updated_domain_user.as_dict()
+        name=updated_domain_user.name,
+        age=updated_domain_user.age,
+        email=updated_domain_user.email,
+        password=updated_domain_user.password,
+        role=updated_domain_user.role
     )
 
 
@@ -88,7 +102,8 @@ def test_invalid_update_user(setup):
         name="newname",
         age=created_domain_user.age + 10,
         password=created_domain_user.password,
-        email=created_domain_user.email
+        email=created_domain_user.email,
+        role=created_domain_user.role
     )
 
     # by invalid selector

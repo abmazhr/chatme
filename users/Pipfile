@@ -18,6 +18,7 @@ swagger-ui-py = "*"
 starlette-apispec = "*"
 aiofiles = "*"
 marshmallow-dataclass = "*"
+marshmallow-enum = "*"
 
 [requires]
 python_version = "3.8"

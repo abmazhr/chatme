@@ -1,10 +1,10 @@
 from pytest import fixture
 from starlette.testclient import TestClient
 
-from src.application.infrastructure.web.rest_api.starlette import StarletteRestApi
 from src.application.infrastructure.persistence.in_memory import InMemoryDatabase
 from src.application.infrastructure.web.entity.route import Route
 from src.application.infrastructure.web.entity.user_json import UserJson
+from src.application.infrastructure.web.rest_api.starlette import StarletteRestApi
 from src.application.infrastructure.web.schema.json.user.put_user import put_user
 from src.application.infrastructure.web.validation.jsonschema import JsonSchemaValidator
 from src.application.usecase.user.update_user import UpdateUserUseCase
@@ -60,14 +60,16 @@ def test_valid_update_user(setup):
         name="newname",
         age=domain_user.age,
         email=domain_user.email,
-        password=domain_user.password
+        password=domain_user.password,
+        role=domain_user.role
     )
 
     updated_user_json = UserJson(
         id="0",
         name=updated_domain_user.name,
         age=updated_domain_user.age,
-        email=updated_domain_user.email
+        email=updated_domain_user.email,
+        role=updated_domain_user.role
     ).as_dict()
 
     dummy_id = "0"
