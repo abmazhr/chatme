@@ -49,7 +49,13 @@ def test_valid_get_user(setup):
     api: TestClient
     domain_user: DomainUser
 
-    user_json = UserJson(id="0", name=domain_user.name, age=domain_user.age, email=domain_user.email).as_dict()
+    user_json = UserJson(
+        id="0",
+        name=domain_user.name,
+        age=domain_user.age,
+        email=domain_user.email,
+        role=domain_user.role
+    ).as_dict()
 
     dummy_id = "0"
     assert api.get(

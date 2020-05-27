@@ -8,7 +8,7 @@ from src.application.types import (
 from src.application.usecase import UseCaseInterface
 from src.application.utilities.functions import exception_handler
 from src.domain.entity.failure import Failure
-from src.domain.entity.user import DomainUser as DomainUser, create_user
+from src.domain.entity.user import DomainUser as DomainUser, create_user, UserRole
 
 
 class AddUserUseCase(UseCaseInterface):
@@ -21,12 +21,14 @@ class AddUserUseCase(UseCaseInterface):
                 username: str,
                 age: int,
                 password: str,
-                email: Maybe[str]) -> Either[Failure, ApplicationUser]:
+                email: Maybe[str],
+                role: UserRole) -> Either[Failure, ApplicationUser]:
         domain_user_creation_status: Either[Failure, DomainUser] = create_user(
             name=username,
             age=age,
             password=password,
-            email=email
+            email=email,
+            role=role
         )
         if isinstance(domain_user_creation_status, Failure):
             return Failure(error=domain_user_creation_status.error)

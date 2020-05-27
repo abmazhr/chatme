@@ -14,7 +14,8 @@ from src.domain.types import (
     AnyStr,
     List,
     Dict,
-    dataclass
+    dataclass,
+    Enum
 )
 
 # simple regex for now ;)
@@ -23,24 +24,33 @@ __password_pattern: Pattern[AnyStr] = compile(r"^(?=.{8,32}$)(?=.*[A-Z])(?=.*[a-
 
 
 @dataclass(frozen=True)
+class UserRole(Enum):
+    ADMIN = 0
+    USER = 1
+
+
+@dataclass(frozen=True)
 class DomainUser:
     name: str
     age: int
     password: str
     email: Maybe[str]
+    role: UserRole
 
     def as_dict(self) -> Dict[str, Any]:
         return dict(
             name=self.name,
             age=self.age,
             password=self.password,
-            email=self.email
+            email=self.email,
+            role=self.role.name
         )
 
 
 # compatibility with marshmallow serialization
 # maybe making it better later ;)
 marshmallow_dataclass.class_schema(DomainUser)
+marshmallow_dataclass.class_schema(UserRole)
 
 
 class __VContainer(NamedTuple):
@@ -53,7 +63,8 @@ def create_user(*,
                 name: str,
                 age: int,
                 password: str,
-                email: Maybe[str]) -> Either[Failure, DomainUser]:
+                email: Maybe[str],
+                role: UserRole) -> Either[Failure, DomainUser]:
     # simple validation
     results: List[Either[Failure, Success]] = list(map(
         __validate, (
@@ -100,7 +111,8 @@ def create_user(*,
         name=name,
         age=age,
         password=password,
-        email=email
+        email=email,
+        role=role
     ) if len(failures) == 0 else Failure(error="\n".join(list(map(lambda failure: failure.error, failures))))
 
 
