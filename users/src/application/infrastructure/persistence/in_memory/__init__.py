@@ -1,3 +1,6 @@
+from jwt import encode
+
+from src.application.infrastructure.web.entity.access_token import AccessToken
 from src.application.entity.health_check import HealthCheckStatus, Status
 from src.application.entity.user import ApplicationUser
 from src.application.infrastructure.persistence import PersistenceInterface
@@ -14,7 +17,7 @@ from src.domain.entity.user import DomainUser as DomainUser
 
 class InMemoryDatabase(PersistenceInterface):
     def __init__(self, *, config: Maybe[SimpleConfig]) -> None:
-        self.__db = dict(ids={}, names={}, emails={})
+        self.__db = dict(ids={}, names={}, emails={}, tokens={})
         self.__last_id = 0  # just simple increment but in real db it's more complicated xD
         super().__init__(config=config)
         """
@@ -33,6 +36,9 @@ class InMemoryDatabase(PersistenceInterface):
             },
             "emails": {
                 "test1@test.com": 0   # which is the id (simple way as symlinks on Unix, may improve later)
+            },
+            "tokens": {
+                "user_1": "token"
             }
         }
         """
@@ -51,6 +57,31 @@ class InMemoryDatabase(PersistenceInterface):
             return HealthCheckStatus(service_name=self.__class__.__name__, service_state=Status.UNHEALTHY)
 
     # maybe later will modularize the functions in modules to be easier to maintain ;)
+
+    @exception_handler
+    def persist_access_token(self, *, username: str, password: str) -> Either[Failure, AccessToken]:
+        fetch_user_status = self._fetch_user_by().name(user_name=username)
+        if isinstance(fetch_user_status, Failure):
+            return fetch_user_status
+
+        if fetch_user_status.password != password:
+            return Failure(error=f"Invalid password for user {username}")
+
+        # will make the generation better and generic later ;)
+        access_token = AccessToken(
+            token=encode({"username": username}, password, algorithm='HS256').decode("utf-8")
+        )
+        self.__db["tokens"][username] = access_token
+
+        return access_token
+
+    @exception_handler
+    def fetch_access_token(self, *, username: str) -> Either[Failure, AccessToken]:
+        fetch_access_token_status = self.__db["tokens"].get(username, None)
+        if fetch_access_token_status is not None:
+            return fetch_access_token_status
+
+        return Failure(error=f"There is no access token for user {username}")
 
     @exception_handler
     def persist_user(self, *, user: DomainUser) -> Either[Failure, ApplicationUser]:

@@ -12,6 +12,8 @@ from starlette.responses import JSONResponse
 from starlette_apispec import APISpecSchemaGenerator
 from swagger_ui import api_doc
 
+from src.application.infrastructure.web.entity.access_token import AccessToken
+from src.application.usecase.user.add_access_token import AddAccessTokenUseCase
 from src.application.entity.service import Service
 from src.application.entity.user import ApplicationUser
 from src.application.infrastructure.web.entity.json import JsonEntity, _A
@@ -134,6 +136,60 @@ class StarletteRestApi(RestApiInterface):
         return wrapper
 
     @classmethod
+    def get_access_token(cls, *,
+                         add_access_token_usecase: AddAccessTokenUseCase,
+                         json_schema: Dict[str, Any],
+                         json_schema_validator: JsonValidatorInterface) -> Callable[..., JsonEntity.of(_type=_A)]:
+        @dataclass(frozen=True)
+        class UserLoginJson:
+            username: str
+            password: str
+
+        marshmallow_dataclass.class_schema(UserLoginJson)
+
+        async def wrapper(request: Request) -> JSONResponse:
+            """
+            requestBody:
+                description: Data to login a user and generate an access token for this particular user
+                required: true
+                content:
+                  application/json:
+                    schema: UserLoginJson
+            responses:
+                200:
+                    description: AccessToken created
+                    content:
+                        application/json:
+                            schema: AccessToken
+                    examples:
+                        - {"token": "token"}
+                400:
+                    description: error generating an access token
+                    content:
+                        application/json:
+                            schema: Failure
+                    examples:
+                    - {"error": "Invalid password for this user"}
+            """
+            json_data: Dict[Any, Any] = await request.json()
+            json_validation_status: Either[Failure, Success] = json_schema_validator.validate(
+                schema=json_schema,
+                data=json_data
+            )
+            if isinstance(json_validation_status, Success):
+                add_access_token_status = add_access_token_usecase.execute(
+                    username=json_data["username"],
+                    password=json_data["password"],
+                )
+                if isinstance(add_access_token_status, AccessToken):
+                    return JSONResponse(add_access_token_status.as_dict(), status_code=200)
+
+                return JSONResponse(add_access_token_status.as_dict(), status_code=400)
+            return JSONResponse(json_validation_status.as_dict(), status_code=400)
+
+        return wrapper
+
+    @classmethod
     def post_user(cls, *,
                   add_user_usecase: AddUserUseCase,
                   json_schema: Dict[str, Any],
@@ -153,9 +209,9 @@ class StarletteRestApi(RestApiInterface):
                         application/json:
                             schema: UserJson
                     examples:
-                        - {"name": "test", "age": 26, "email": "test@test.com"}
+                        - {"name": "test", "age": 26, "email": "test@test.com", "role": "USER"}
                 400:
-                    description: User created
+                    description: error creating a user
                     content:
                         application/json:
                             schema: Failure
@@ -213,7 +269,7 @@ class StarletteRestApi(RestApiInterface):
                     application/json:
                         schema: UserJson
                examples:
-                   - {"name": "test", "age": 26, "email": "test@test.com"}
+                   - {"name": "test", "age": 26, "email": "test@test.com", "role": "USER"}
              400:
                description: error fetching the user
                content:
@@ -274,7 +330,7 @@ class StarletteRestApi(RestApiInterface):
                         application/json:
                             schema: ApplicationUser
                     examples:
-                        - {"name": "test", "age": 26, "email": "test@test.com", "password": "Str0ngPassword"}
+                        - {"name": "test", "age": 26, "email": "test@test.com", "password": "Str0ngPassword", "role": "USER"}
                 400:
                     description: Error updating the user
                     content:
@@ -336,18 +392,13 @@ class StarletteRestApi(RestApiInterface):
             responses:
                 200:
                     description: User deleted
-                    content:
-                        application/json:
-                            schema: ApplicationUser
-                    examples:
-                        - {"name": "test", "age": 26, "email": "test@test.com", "password": "Str0ngPassword"}
                 400:
                     description: Error deleting the user
                     content:
                         application/json:
                             schema: Failure
                     examples:
-                    - {"error": "Update selector should be within this list ['id', 'name', 'email']"}
+                    - {"error": "Delete selector should be within this list ['id', 'name', 'email']"}
             """
             params = request.query_params
 

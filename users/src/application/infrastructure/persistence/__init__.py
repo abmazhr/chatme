@@ -1,5 +1,6 @@
 from abc import ABCMeta, abstractmethod
 
+from src.application.infrastructure.web.entity.access_token import AccessToken
 from src.application.entity.health_check import HealthCheckStatus
 from src.application.entity.user import ApplicationUser
 from src.application.types import (
@@ -70,6 +71,12 @@ class PersistenceInterface(metaclass=ABCMeta):
             password=user.password,
             role=user.role
         )
+
+    @abstractmethod
+    def persist_access_token(self, *, username: str, password: str) -> Either[Failure, AccessToken]: pass
+
+    @abstractmethod
+    def fetch_access_token(self, *, username: str) -> Either[Failure, AccessToken]: pass
 
     @abstractmethod
     def persist_user(self, *, user: DomainUser) -> Either[Failure, ApplicationUser]: pass

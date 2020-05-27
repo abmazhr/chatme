@@ -19,6 +19,7 @@ starlette-apispec = "*"
 aiofiles = "*"
 marshmallow-dataclass = "*"
 marshmallow-enum = "*"
+pyjwt = "*"
 
 [requires]
 python_version = "3.8"
