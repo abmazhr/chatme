@@ -1,5 +1,5 @@
-from src.application.infrastructure.web.entity.access_token import AccessToken
 from src.application.infrastructure.persistence import PersistenceInterface
+from src.application.infrastructure.web.entity.access_token import AccessToken
 from src.application.types import (
     Maybe,
     Either,
@@ -18,9 +18,7 @@ class FetchAccessTokenUseCase(UseCaseInterface):
         super().__init__(config=config, persistence=persistence)
 
     @exception_handler
-    def execute(self, *,
-                username: str,
-                password: str) -> Either[Failure, AccessToken]:
+    def execute(self, *, username: str) -> Either[Failure, AccessToken]:
         return self.__persistence.fetch_access_token(
             username=username
         )

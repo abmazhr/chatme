@@ -1,6 +1,5 @@
 from abc import ABCMeta, abstractmethod
 
-from src.application.usecase.user.add_access_token import AddAccessTokenUseCase
 from src.application.entity.service import Service
 from src.application.infrastructure.web.entity.json import _A, JsonEntity
 from src.application.infrastructure.web.entity.route import Route
@@ -13,8 +12,10 @@ from src.application.types import (
     Dict,
     Any
 )
+from src.application.usecase.user.add_access_token import AddAccessTokenUseCase
 from src.application.usecase.user.add_user import AddUserUseCase
 from src.application.usecase.user.delete_user import DeleteUserUseCase
+from src.application.usecase.user.fetch_access_token import FetchAccessTokenUseCase
 from src.application.usecase.user.fetch_user import FetchUserUseCase
 from src.application.usecase.user.update_user import UpdateUserUseCase
 
@@ -75,7 +76,8 @@ class RestApiInterface(metaclass=ABCMeta):
     @classmethod
     @abstractmethod
     def get_user(cls, *,
-                 fetch_user_usecase: FetchUserUseCase) -> Callable[..., JsonEntity.of(_type=_A)]:
+                 fetch_user_usecase: FetchUserUseCase,
+                 fetch_access_token_usecase: FetchAccessTokenUseCase) -> Callable[..., JsonEntity.of(_type=_A)]:
         @abstractmethod
         def wrapper(*args, **kwargs) -> JsonEntity.of(_type=_A): pass
 
@@ -85,6 +87,8 @@ class RestApiInterface(metaclass=ABCMeta):
     @abstractmethod
     def update_user(cls, *,
                     update_user_usecase: UpdateUserUseCase,
+                    fetch_user_usecase: FetchUserUseCase,
+                    fetch_access_token_usecase: FetchAccessTokenUseCase,
                     json_schema: Dict[str, Any],
                     json_schema_validator: JsonValidatorInterface) -> Callable[..., JsonEntity.of(_type=_A)]:
         @abstractmethod
@@ -95,7 +99,9 @@ class RestApiInterface(metaclass=ABCMeta):
     @classmethod
     @abstractmethod
     def delete_user(cls, *,
-                    delete_user_usecase: DeleteUserUseCase) -> Callable[..., JsonEntity.of(_type=_A)]:
+                    delete_user_usecase: DeleteUserUseCase,
+                    fetch_user_usecase: FetchUserUseCase,
+                    fetch_access_token_usecase: FetchAccessTokenUseCase) -> Callable[..., JsonEntity.of(_type=_A)]:
         @abstractmethod
         def wrapper(*args, **kwargs) -> JsonEntity.of(_type=_A): pass
 

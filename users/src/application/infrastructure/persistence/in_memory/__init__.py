@@ -1,9 +1,9 @@
 from jwt import encode
 
-from src.application.infrastructure.web.entity.access_token import AccessToken
 from src.application.entity.health_check import HealthCheckStatus, Status
 from src.application.entity.user import ApplicationUser
 from src.application.infrastructure.persistence import PersistenceInterface
+from src.application.infrastructure.web.entity.access_token import AccessToken
 from src.application.types import (
     Maybe,
     Either,
@@ -142,6 +142,11 @@ class InMemoryDatabase(PersistenceInterface):
                         user=updated_user,
                         user_id=fetch_status.id
                     )
+
+                    access_token_status = db["tokens"].get(fetch_status.name, None)
+                    if access_token_status is not None:
+                        del db["tokens"][fetch_status.name]
+                        db["tokens"][updated_user.name] = access_token_status
 
                     return db["ids"][fetch_status.id]
 

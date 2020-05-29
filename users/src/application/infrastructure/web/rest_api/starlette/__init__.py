@@ -12,10 +12,9 @@ from starlette.responses import JSONResponse
 from starlette_apispec import APISpecSchemaGenerator
 from swagger_ui import api_doc
 
-from src.application.infrastructure.web.entity.access_token import AccessToken
-from src.application.usecase.user.add_access_token import AddAccessTokenUseCase
 from src.application.entity.service import Service
 from src.application.entity.user import ApplicationUser
+from src.application.infrastructure.web.entity.access_token import AccessToken
 from src.application.infrastructure.web.entity.json import JsonEntity, _A
 from src.application.infrastructure.web.entity.route import Route
 from src.application.infrastructure.web.entity.user_json import UserJson
@@ -29,8 +28,10 @@ from src.application.types import (
     SimpleConfig,
     dataclass
 )
+from src.application.usecase.user.add_access_token import AddAccessTokenUseCase
 from src.application.usecase.user.add_user import AddUserUseCase
 from src.application.usecase.user.delete_user import DeleteUserUseCase
+from src.application.usecase.user.fetch_access_token import FetchAccessTokenUseCase
 from src.application.usecase.user.fetch_user import FetchUserUseCase
 from src.application.usecase.user.update_user import UpdateUserUseCase
 from src.application.utilities.functions import exception_handler
@@ -243,10 +244,24 @@ class StarletteRestApi(RestApiInterface):
         return wrapper
 
     @classmethod
-    def get_user(cls, *, fetch_user_usecase: FetchUserUseCase) -> Callable[..., JsonEntity.of(_type=_A)]:
+    def get_user(cls, *,
+                 fetch_user_usecase: FetchUserUseCase,
+                 fetch_access_token_usecase: FetchAccessTokenUseCase) -> Callable[..., JsonEntity.of(_type=_A)]:
         async def wrapper(request: Request) -> JSONResponse:
             """
             parameters:
+                - in: header
+                  name: username
+                  schema:
+                    type: string
+                  description: The username of the user who has an access-token
+                  require: true
+                - in: header
+                  name: access-token
+                  schema:
+                    type: string
+                  description: The access-token of the user currently doing this request
+                  require: true
                 - in: query
                   name: id
                   schema:
@@ -277,27 +292,66 @@ class StarletteRestApi(RestApiInterface):
                         schema: Failure
                examples:
                    - {"error": "You should provide params as one of these [id, name, email]"}
+             401:
+                description: unauthorized
+                content:
+                    application/json:
+                        schema: Failure
+                examples:
+                    - {"error": "You should provide username and access-token into the headers."}
             """
-            params = request.query_params
-
-            if len(params) > 0:
-                selector_key = list(params.keys())[0]
-                selector_value = params[selector_key]
-                fetch_user_status = fetch_user_usecase.execute(
-                    fetch_by_selector=selector_key,
-                    fetch_by_data=selector_value
+            # simple validation for now, will be better later ;)
+            username = request.headers.get("username", None)
+            token = request.headers.get("access-token", None)
+            if username is not None and token is not None:
+                current_logged_user_fetch_status = fetch_user_usecase.execute(
+                    fetch_by_selector='name',
+                    fetch_by_data=username
                 )
+                access_token_status = fetch_access_token_usecase.execute(
+                    username=username
+                )
+                if isinstance(access_token_status, Failure):
+                    return JSONResponse(access_token_status.as_dict(), 401)
 
-                if isinstance(fetch_user_status, ApplicationUser):
-                    user_json: UserJson = from_application_user_to_json_user(
-                        application_user=fetch_user_status
+                if access_token_status.token != token:
+                    return JSONResponse(Failure(error=f"Invalid access token for the user {username}").as_dict(), 401)
+
+                if isinstance(current_logged_user_fetch_status, ApplicationUser):
+                    params = request.query_params
+                    if len(params) > 0:
+                        selector_key = list(params.keys())[0]
+                        selector_value = params[selector_key]
+                        fetch_user_status = fetch_user_usecase.execute(
+                            fetch_by_selector=selector_key,
+                            fetch_by_data=selector_value
+                        )
+                        if isinstance(fetch_user_status, ApplicationUser):
+                            if current_logged_user_fetch_status.role.name == UserRole.ADMIN.name:
+                                pass
+                            elif current_logged_user_fetch_status.role.name == UserRole.USER.name:
+                                if fetch_user_status.name != username:
+                                    return JSONResponse(
+                                        Failure(
+                                            error="Your current user permission is not satisfying this operation."
+                                        ),
+                                        status_code=401
+                                    )
+                            user_json: UserJson = from_application_user_to_json_user(
+                                application_user=fetch_user_status
+                            )
+                            return JSONResponse(user_json.as_dict(), status_code=200)
+
+                        return JSONResponse(fetch_user_status.as_dict(), status_code=400)
+                    return JSONResponse(
+                        Failure(error="You should provide params as one of these [id, name, email]").as_dict(),
+                        status_code=400
                     )
-                    return JSONResponse(user_json.as_dict(), status_code=200)
 
-                return JSONResponse(fetch_user_status.as_dict(), status_code=400)
+                return JSONResponse(current_logged_user_fetch_status.as_dict(), 400)
+
             return JSONResponse(
-                Failure(error="You should provide params as one of these [id, name, email]").as_dict(),
-                status_code=400
+                Failure(error="You should provide username and access-token into the headers.").as_dict(), 401
             )
 
         return wrapper
@@ -305,6 +359,8 @@ class StarletteRestApi(RestApiInterface):
     @classmethod
     def update_user(cls, *,
                     update_user_usecase: UpdateUserUseCase,
+                    fetch_user_usecase: FetchUserUseCase,
+                    fetch_access_token_usecase: FetchAccessTokenUseCase,
                     json_schema: Dict[str, Any],
                     json_schema_validator: JsonValidatorInterface) -> Callable[..., JsonEntity.of(_type=_A)]:
         @dataclass(frozen=True)
@@ -317,6 +373,19 @@ class StarletteRestApi(RestApiInterface):
 
         async def wrapper(request: Request) -> JSONResponse:
             """
+            parameters:
+                - in: header
+                  name: username
+                  schema:
+                    type: string
+                  description: The username of the user who has an access-token
+                  require: true
+                - in: header
+                  name: access-token
+                  schema:
+                    type: string
+                  description: The access-token of the user currently doing this request
+                  require: true
             requestBody:
                 description: Data to update a user
                 required: true
@@ -338,42 +407,98 @@ class StarletteRestApi(RestApiInterface):
                             schema: Failure
                     examples:
                     - {"error": "Update selector should be within this list ['id', 'name', 'email']"}
+                401:
+                    description: unauthorized
+                    content:
+                        application/json:
+                            schema: Failure
+                    examples:
+                        - {"error": "You should provide username and access-token into the headers."}
             """
-            json_data: Dict[Any, Any] = await request.json()
-            json_validation_status: Either[Failure, Success] = json_schema_validator.validate(
-                schema=json_schema,
-                data=json_data
-            )
-            if isinstance(json_validation_status, Success):
-                # will make this better later ;)
-                json_data["updated_user"]["role"] = UserRole.USER
-                create_domain_user_status = create_user(
-                    **json_data["updated_user"]
+            # simple validation for now, will be better later ;)
+            username = request.headers.get("username", None)
+            token = request.headers.get("access-token", None)
+            if username is not None and token is not None:
+                current_logged_user_fetch_status = fetch_user_usecase.execute(
+                    fetch_by_selector='name',
+                    fetch_by_data=username
                 )
-                if isinstance(create_domain_user_status, Failure):
-                    return JSONResponse(create_domain_user_status.as_dict())
+                access_token_status = fetch_access_token_usecase.execute(
+                    username=username
+                )
+                if isinstance(access_token_status, Failure):
+                    return JSONResponse(access_token_status.as_dict(), 401)
 
-                update_user_status = update_user_usecase.execute(
-                    update_by_selector=json_data["update_by_selector"],
-                    update_by_data=json_data["update_by_data"],
-                    updated_user=create_domain_user_status
-                )
-                if isinstance(update_user_status, ApplicationUser):
-                    user_json = from_application_user_to_json_user(
-                        application_user=update_user_status
+                if access_token_status.token != token:
+                    return JSONResponse(Failure(error=f"Invalid access token for the user {username}").as_dict(), 401)
+
+                if isinstance(current_logged_user_fetch_status, ApplicationUser):
+                    json_data: Dict[Any, Any] = await request.json()
+                    json_validation_status: Either[Failure, Success] = json_schema_validator.validate(
+                        schema=json_schema,
+                        data=json_data
                     )
-                    return JSONResponse(user_json.as_dict(), status_code=200)
+                    if isinstance(json_validation_status, Success):
+                        # will make this better later ;)
+                        json_data["updated_user"]["role"] = UserRole.USER
+                        create_domain_user_status = create_user(
+                            **json_data["updated_user"]
+                        )
+                        if isinstance(create_domain_user_status, Failure):
+                            return JSONResponse(create_domain_user_status.as_dict())
+                        if current_logged_user_fetch_status.role.name == UserRole.ADMIN.name:
+                            pass
+                        elif current_logged_user_fetch_status.role.name == UserRole.USER.name:
+                            if current_logged_user_fetch_status.name != username:
+                                return JSONResponse(
+                                    Failure(
+                                        error="Your current user permission is not satisfying this operation."
+                                    ).as_dict(),
+                                    status_code=401
+                                )
 
-                return JSONResponse(update_user_status.as_dict(), status_code=400)
-            return JSONResponse(json_validation_status.as_dict(), status_code=400)
+                        update_user_status = update_user_usecase.execute(
+                            update_by_selector=json_data["update_by_selector"],
+                            update_by_data=json_data["update_by_data"],
+                            updated_user=create_domain_user_status
+                        )
+                        if isinstance(update_user_status, ApplicationUser):
+                            user_json = from_application_user_to_json_user(
+                                application_user=update_user_status
+                            )
+                            return JSONResponse(user_json.as_dict(), status_code=200)
+
+                        return JSONResponse(update_user_status.as_dict(), status_code=400)
+                    return JSONResponse(json_validation_status.as_dict(), status_code=400)
+
+                return JSONResponse(current_logged_user_fetch_status.as_dict(), 401)
+
+            return JSONResponse(
+                Failure(error="You should provide username and access-token into the headers.").as_dict(), 401
+            )
 
         return wrapper
 
     @classmethod
-    def delete_user(cls, *, delete_user_usecase: DeleteUserUseCase) -> Callable[..., JsonEntity.of(_type=_A)]:
+    def delete_user(cls, *,
+                    delete_user_usecase: DeleteUserUseCase,
+                    fetch_user_usecase: FetchUserUseCase,
+                    fetch_access_token_usecase: FetchAccessTokenUseCase) -> Callable[..., JsonEntity.of(_type=_A)]:
         async def wrapper(request: Request) -> JSONResponse:
             """
             parameters:
+                - in: header
+                  name: username
+                  schema:
+                    type: string
+                  description: The username of the user who has an access-token
+                  require: true
+                - in: header
+                  name: access-token
+                  schema:
+                    type: string
+                  description: The access-token of the user currently doing this request
+                  require: true
                 - in: query
                   name: id
                   schema:
@@ -399,22 +524,72 @@ class StarletteRestApi(RestApiInterface):
                             schema: Failure
                     examples:
                     - {"error": "Delete selector should be within this list ['id', 'name', 'email']"}
+                401:
+                    description: unauthorized
+                    content:
+                        application/json:
+                            schema: Failure
+                    examples:
+                        - {"error": "You should provide username and access-token into the headers."}
             """
-            params = request.query_params
-
-            if len(params) > 0:
-                selector_key = list(params.keys())[0]
-                selector_value = params[selector_key]
-                delete_user_status = delete_user_usecase.execute(
-                    delete_by_selector=selector_key,
-                    delete_by_data=selector_value
+            # simple validation for now, will be better later ;)
+            username = request.headers.get("username", None)
+            token = request.headers.get("access-token", None)
+            if username is not None and token is not None:
+                current_logged_user_fetch_status = fetch_user_usecase.execute(
+                    fetch_by_selector='name',
+                    fetch_by_data=username
                 )
+                access_token_status = fetch_access_token_usecase.execute(
+                    username=username
+                )
+                if isinstance(access_token_status, Failure):
+                    return JSONResponse(access_token_status.as_dict(), 401)
 
-                return JSONResponse(delete_user_status.as_dict(), status_code=200)
+                if access_token_status.token != token:
+                    return JSONResponse(Failure(error=f"Invalid access token for the user {username}").as_dict(), 401)
 
+                if isinstance(current_logged_user_fetch_status, ApplicationUser):
+                    params = request.query_params
+
+                    if len(params) > 0:
+                        selector_key = list(params.keys())[0]
+                        selector_value = params[selector_key]
+                        if current_logged_user_fetch_status.role.name == UserRole.ADMIN.name:
+                            pass
+                        elif current_logged_user_fetch_status.role.name == UserRole.USER.name:
+                            permission_error_json = JSONResponse(
+                                Failure(
+                                    error="Your current user permission is not satisfying this operation."
+                                ).as_dict(),
+                                status_code=401
+                            )
+
+                            if selector_key == "id":
+                                if current_logged_user_fetch_status.id != selector_value:
+                                    return permission_error_json
+                            if selector_key == "name":
+                                if current_logged_user_fetch_status.name != selector_value:
+                                    return permission_error_json
+                            if selector_key == "email":
+                                if current_logged_user_fetch_status.email != selector_value:
+                                    return permission_error_json
+
+                        delete_user_status = delete_user_usecase.execute(
+                            delete_by_selector=selector_key,
+                            delete_by_data=selector_value
+                        )
+
+                        return JSONResponse(delete_user_status.as_dict(), status_code=200)
+
+                    return JSONResponse(
+                        Failure(error="You should provide params as one of these [id, name, email]").as_dict(),
+                        status_code=400
+                    )
+
+                return JSONResponse(current_logged_user_fetch_status.as_dict(), 401)
             return JSONResponse(
-                Failure(error="You should provide params as one of these [id, name, email]").as_dict(),
-                status_code=400
+                Failure(error="You should provide username and access-token into the headers.").as_dict(), 401
             )
 
         return wrapper
