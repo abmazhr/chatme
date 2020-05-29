@@ -1,6 +1,9 @@
 from pytest import fixture
 from starlette.testclient import TestClient
 
+from src.application.infrastructure.web.entity.access_token import AccessToken
+from src.application.usecase.user.fetch_access_token import FetchAccessTokenUseCase
+from src.application.usecase.user.fetch_user import FetchUserUseCase
 from src.application.infrastructure.persistence.in_memory import InMemoryDatabase
 from src.application.infrastructure.web.entity.route import Route
 from src.application.infrastructure.web.entity.user_json import UserJson
@@ -19,6 +22,7 @@ def setup():
     )
     domain_user = generate_valid_domain_user()
     db.persist_user(user=domain_user)
+    token = db.persist_access_token(username=domain_user.name, password=domain_user.password)
     host = "0.0.0.0"
     port = 3000
 
@@ -37,6 +41,14 @@ def setup():
                         config=None,
                         persistence=db
                     ),
+                    fetch_user_usecase=FetchUserUseCase(
+                        config=None,
+                        persistence=db
+                    ),
+                    fetch_access_token_usecase=FetchAccessTokenUseCase(
+                        config=None,
+                        persistence=db
+                    ),
                     json_schema=put_user,
                     json_schema_validator=JsonSchemaValidator(
                         config=None
@@ -47,14 +59,15 @@ def setup():
     )
     test_api = TestClient(app=api.__dict__["_StarletteRestApi__app"])
 
-    yield test_api, domain_user
-    del api, test_api, db
+    yield test_api, domain_user, token
+    del api, test_api, db, token
 
 
 def test_valid_update_user(setup):
-    api, domain_user = setup
+    api, domain_user, token = setup
     api: TestClient
     domain_user: DomainUser
+    token: AccessToken
 
     updated_domain_user = create_user(
         name="newname",
@@ -79,14 +92,19 @@ def test_valid_update_user(setup):
             'updated_user': updated_domain_user.as_dict(),
             'update_by_selector': 'id',
             'update_by_data': dummy_id
+        },
+        headers={
+            'username': domain_user.name,
+            'access-token': token.token
         }
     ).json() == updated_user_json
 
 
 def test_invalid_update_user(setup):
-    api, domain_user = setup
+    api, domain_user, token = setup
     api: TestClient
     domain_user: DomainUser
+    token: AccessToken
 
     dummy_id = "0"
 
@@ -100,6 +118,10 @@ def test_invalid_update_user(setup):
                 email=domain_user.email,
                 password=domain_user.password
             ),
+        },
+        headers={
+            'username': domain_user.name,
+            'access-token': token.token
         }
     ).json() == {'error': "'update_by_selector' is a required property"}
 
@@ -115,6 +137,10 @@ def test_invalid_update_user(setup):
             ),
             'update_by_selector': 'id',
             'update_by_data': dummy_id
+        },
+        headers={
+            'username': domain_user.name,
+            'access-token': token.token
         }
     ).json() == {'error': 'name should be alpha or alpha numeric.'}
 
@@ -130,6 +156,10 @@ def test_invalid_update_user(setup):
             ),
             'update_by_selector': 'id',
             'update_by_data': dummy_id
+        },
+        headers={
+            'username': domain_user.name,
+            'access-token': token.token
         }
     ).json() == {'error': 'age should be between 16 and 150.'}
 
@@ -145,5 +175,9 @@ def test_invalid_update_user(setup):
             ),
             'update_by_selector': 'id',
             'update_by_data': dummy_id
+        },
+        headers={
+            'username': domain_user.name,
+            'access-token': token.token
         }
     ).json() == {'error': 'email should be a valid one.'}

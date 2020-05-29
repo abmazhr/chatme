@@ -3,6 +3,7 @@ import sys
 
 from application.infrastructure.web.schema.json.user.login_user import login_user
 from application.usecase.user.add_access_token import AddAccessTokenUseCase
+from application.usecase.user.fetch_access_token import FetchAccessTokenUseCase
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
@@ -47,7 +48,8 @@ StarletteRestApi(
             handler=StarletteRestApi.get_user,
             args=None,
             kwargs=dict(
-                fetch_user_usecase=FetchUserUseCase(config=None, persistence=db)
+                fetch_user_usecase=FetchUserUseCase(config=None, persistence=db),
+                fetch_access_token_usecase=FetchAccessTokenUseCase(config=None, persistence=db)
             )
         ),
         Route(
@@ -76,6 +78,14 @@ StarletteRestApi(
                     config=None,
                     persistence=db
                 ),
+                fetch_user_usecase=FetchUserUseCase(
+                    config=None,
+                    persistence=db
+                ),
+                fetch_access_token_usecase=FetchAccessTokenUseCase(
+                    config=None,
+                    persistence=db
+                ),
                 json_schema=put_user,
                 json_schema_validator=JsonSchemaValidator(
                     config=None
@@ -89,6 +99,14 @@ StarletteRestApi(
             args=None,
             kwargs=dict(
                 delete_user_usecase=DeleteUserUseCase(
+                    config=None,
+                    persistence=db
+                ),
+                fetch_user_usecase=FetchUserUseCase(
+                    config=None,
+                    persistence=db
+                ),
+                fetch_access_token_usecase=FetchAccessTokenUseCase(
                     config=None,
                     persistence=db
                 )

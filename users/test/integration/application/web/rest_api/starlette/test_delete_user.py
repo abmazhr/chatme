@@ -1,6 +1,9 @@
 from pytest import fixture
 from starlette.testclient import TestClient
 
+from src.application.infrastructure.web.entity.access_token import AccessToken
+from src.application.usecase.user.fetch_access_token import FetchAccessTokenUseCase
+from src.application.usecase.user.fetch_user import FetchUserUseCase
 from src.application.infrastructure.persistence.in_memory import InMemoryDatabase
 from src.application.infrastructure.web.entity.route import Route
 from src.application.infrastructure.web.rest_api.starlette import StarletteRestApi
@@ -30,6 +33,14 @@ def setup():
                     delete_user_usecase=DeleteUserUseCase(
                         config=None,
                         persistence=db
+                    ),
+                    fetch_user_usecase=FetchUserUseCase(
+                        config=None,
+                        persistence=db
+                    ),
+                    fetch_access_token_usecase=FetchAccessTokenUseCase(
+                        config=None,
+                        persistence=db
                     )
                 )
             )
@@ -48,12 +59,17 @@ def test_valid_delete_user(setup):
 
     domain_user = generate_valid_domain_user()
     db.persist_user(user=domain_user)
+    token: AccessToken = db.persist_access_token(username=domain_user.name, password=domain_user.password)
 
     # by id
     db.persist_user(user=domain_user)
     dummy_id = "0"
     assert api.delete(
         url=f"/users?id={dummy_id}",
+        headers={
+            'username': domain_user.name,
+            'access-token': token.token
+        }
     ).json() == Success().as_dict()
 
     # by name
@@ -61,6 +77,10 @@ def test_valid_delete_user(setup):
     dummy_name = domain_user.name
     assert api.delete(
         url=f"/users?name={dummy_name}",
+        headers={
+            'username': domain_user.name,
+            'access-token': token.token
+        }
     ).json() == Success().as_dict()
 
     # by email
@@ -68,6 +88,10 @@ def test_valid_delete_user(setup):
     dummy_email = domain_user.email
     assert api.delete(
         url=f"/users?email={dummy_email}",
+        headers={
+            'username': domain_user.name,
+            'access-token': token.token
+        }
     ).json() == Success().as_dict()
 
 
@@ -78,23 +102,80 @@ def test_invalid_delete_user(setup):
 
     domain_user = generate_valid_domain_user()
 
-    # invalid id
+    # empty headers
     db.persist_user(user=domain_user)
+    token: AccessToken = db.persist_access_token(username=domain_user.name, password=domain_user.password)
     dummy_id = 200
     assert api.delete(
-        url=f"/users?id={dummy_id}"
-    ).json() == {'error': 'There is no user with id 200 to be deleted'}
+        url=f"/users?id={dummy_id}",
+        headers={
+            'username': domain_user.name,
+            'access-token': "invalid"
+        }
+    ).json() == {'error': 'Invalid access token for the user test'}
+
+    # invalid user
+    db.persist_user(user=domain_user)
+    token: AccessToken = db.persist_access_token(username=domain_user.name, password=domain_user.password)
+    dummy_id = 200
+    assert api.delete(
+        url=f"/users?id={dummy_id}",
+        headers={
+            'username': "invaliduser",
+            'access-token': token.token
+        }
+    ).json() == {'error': 'There is no access token for user invaliduser'}
+
+    # insufficient user permission
+    db.persist_user(user=domain_user)
+    token: AccessToken = db.persist_access_token(username=domain_user.name, password=domain_user.password)
+    dummy_id = 200
+    assert api.delete(
+        url=f"/users?id={dummy_id}",
+        headers={
+            'username': domain_user.name,
+            'access-token': token.token
+        }
+    ).json() == {'error': 'Your current user permission is not satisfying this operation.'}
+
+    # invalid tokens
+    db.persist_user(user=domain_user)
+    token: AccessToken = db.persist_access_token(username=domain_user.name, password=domain_user.password)
+    dummy_id = 200
+    assert api.delete(
+        url=f"/users?id={dummy_id}",
+    ).json() == {'error': 'You should provide username and access-token into the headers.'}
+
+    # invalid id
+    db.persist_user(user=domain_user)
+    token: AccessToken = db.persist_access_token(username=domain_user.name, password=domain_user.password)
+    dummy_id = 200
+    assert api.delete(
+        url=f"/users?id={dummy_id}",
+        headers={
+            'username': domain_user.name,
+            'access-token': token.token
+        }
+    ).json() == {'error': 'Your current user permission is not satisfying this operation.'}
 
     # invalid name
     db.persist_user(user=domain_user)
     dummy_name = "invalid"
     assert api.delete(
-        url=f"/users?name={dummy_name}"
-    ).json() == {'error': 'There is no user with name invalid to be deleted'}
+        url=f"/users?name={dummy_name}",
+        headers={
+            'username': domain_user.name,
+            'access-token': token.token
+        }
+    ).json() == {'error': 'Your current user permission is not satisfying this operation.'}
 
     # invalid age selector
     db.persist_user(user=domain_user)
     dummy_age = domain_user.age
     assert api.delete(
-        url=f"/users?age={dummy_age}"
+        url=f"/users?age={dummy_age}",
+        headers={
+            'username': domain_user.name,
+            'access-token': token.token
+        }
     ).json() == {'error': "Delete selector should be within this list ['id', 'name', 'email']"}

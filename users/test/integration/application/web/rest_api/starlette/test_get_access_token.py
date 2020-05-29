@@ -72,8 +72,7 @@ def test_valid_get_access_token(setup):
         config=None,
         persistence=db
     ).execute(
-        username=domain_user.name,
-        password=domain_user.password
+        username=domain_user.name
     ), AccessToken)
 
 
