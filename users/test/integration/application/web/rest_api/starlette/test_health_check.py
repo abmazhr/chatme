@@ -5,7 +5,7 @@ from src.application.entity.health_check import Status
 from src.application.entity.service import Service
 from src.application.infrastructure.persistence.in_memory import InMemoryDatabase
 from src.application.infrastructure.web.entity.route import Route
-from src.application.infrastructure.web.rest_api.starlette import StarletteRestApi
+from src.application.infrastructure.web.rest_api.framework_logic.starlette import StarletteRestApi
 
 
 @fixture(scope="function")

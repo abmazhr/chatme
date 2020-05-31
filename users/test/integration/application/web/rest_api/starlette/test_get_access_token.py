@@ -7,7 +7,7 @@ from src.application.usecase.user.add_access_token import AddAccessTokenUseCase
 from src.application.usecase.user.fetch_access_token import FetchAccessTokenUseCase
 from src.application.infrastructure.persistence.in_memory import InMemoryDatabase
 from src.application.infrastructure.web.entity.route import Route
-from src.application.infrastructure.web.rest_api.starlette import StarletteRestApi
+from src.application.infrastructure.web.rest_api.framework_logic.starlette import StarletteRestApi
 from src.application.infrastructure.web.validation.jsonschema import JsonSchemaValidator
 from src.domain.entity.user import DomainUser
 from test.utilities.user import generate_valid_domain_user

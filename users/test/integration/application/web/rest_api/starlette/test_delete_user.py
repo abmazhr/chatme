@@ -1,12 +1,12 @@
 from pytest import fixture
 from starlette.testclient import TestClient
 
+from src.application.infrastructure.web.rest_api.framework_logic.starlette import StarletteRestApi
 from src.application.infrastructure.web.entity.access_token import AccessToken
 from src.application.usecase.user.fetch_access_token import FetchAccessTokenUseCase
 from src.application.usecase.user.fetch_user import FetchUserUseCase
 from src.application.infrastructure.persistence.in_memory import InMemoryDatabase
 from src.application.infrastructure.web.entity.route import Route
-from src.application.infrastructure.web.rest_api.starlette import StarletteRestApi
 from src.application.usecase.user.delete_user import DeleteUserUseCase
 from src.domain.entity.success import Success
 from test.utilities.user import generate_valid_domain_user
