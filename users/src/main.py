@@ -10,7 +10,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 from src.application.entity.service import Service
 from src.application.infrastructure.persistence.in_memory import InMemoryDatabase
 from src.application.infrastructure.web.entity.route import Route
-from src.application.infrastructure.web.rest_api.starlette import StarletteRestApi
+from src.application.infrastructure.web.rest_api.framework_logic.starlette import StarletteRestApi
 from src.application.infrastructure.web.schema.json.user.post_user import post_user
 from src.application.infrastructure.web.schema.json.user.put_user import put_user
 from src.application.infrastructure.web.validation.jsonschema import JsonSchemaValidator
