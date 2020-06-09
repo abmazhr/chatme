@@ -13,9 +13,12 @@ export default class PersistAccessTokenUseCase implements UseCaseInterface {
     this._persistence = persistence;
   }
 
-  public execute({ username, accessToken }: {
-    username: string,
-    accessToken: AccessToken
+  public execute({
+    username,
+    accessToken,
+  }: {
+    username: string;
+    accessToken: AccessToken;
   }): Promise<Either<Failure, Success>> {
     return Promise.resolve(this._persistence.persistAccessToken({ username, accessToken }));
   }

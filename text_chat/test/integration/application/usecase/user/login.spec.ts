@@ -8,7 +8,7 @@ const expect = chai.expect;
 const httpClient = new AxiosHttpClient();
 const usersServiceHealthCheckUseCase = new UsersServiceHealthCheckUseCase({
   httpClient,
-  usersServiceEndpoint: 'http://localhost:3000/healthz', // hard coded for now and then from config file\env vars ;)
+  usersServiceHealthCheckEndpoint: 'http://localhost:3000/healthz', // hard coded for now and then from config file\env vars ;)
 });
 const loginUserUseCase = new LoginUserUseCase({
   httpClient,
@@ -20,9 +20,8 @@ describe('Login User', () => {
   it('should be Failure or Success // Maybe making it better with internet check later? :D', async () => {
     const username = 'username';
     const password = 'password';
-    await loginUserUseCase.execute({ username, password })
-      .then((response) => {
-        expect(response._tag).to.be.oneOf(['Left', 'Right']);
-      });
+    await loginUserUseCase.execute({ username, password }).then(response => {
+      expect(response._tag).to.be.oneOf(['Left', 'Right']);
+    });
   });
 });
