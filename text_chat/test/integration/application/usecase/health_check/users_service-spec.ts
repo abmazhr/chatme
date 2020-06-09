@@ -5,18 +5,16 @@ import UsersServiceHealthCheckUseCase from '../../../../../src/application/useca
 
 const expect = chai.expect;
 
-
 describe('Users Service Health check natively', () => {
   const httpClient = new AxiosHttpClient();
   const usersServiceHealthCheckUseCase = new UsersServiceHealthCheckUseCase({
     httpClient,
-    usersServiceEndpoint: 'http://localhost:3000/healthz', // hard coded for now and then from config file\env vars ;)
+    usersServiceHealthCheckEndpoint: 'http://localhost:3000/healthz', // hard coded for now and then from config file\env vars ;)
   });
 
   it('should be Failure or Success // Maybe making it better with internet check later? :D', async () => {
-    await usersServiceHealthCheckUseCase.execute()
-      .then((response) => {
-        expect(response._tag).to.be.oneOf(['Right', 'Left']);
-      });
+    await usersServiceHealthCheckUseCase.execute().then(response => {
+      expect(response._tag).to.be.oneOf(['Right', 'Left']);
+    });
   });
 });
