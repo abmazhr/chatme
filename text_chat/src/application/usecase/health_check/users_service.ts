@@ -22,7 +22,7 @@ export default class UsersServiceHealthCheckUseCase implements UseCaseInterface 
   }
 
   public execute(): Promise<Either<Failure, Success>> {
-    return this._httpClient.get({ endpoint: this._usersServiceHealthCheckEndpoint }).then(response => {
+    return this._httpClient.get({ endpoint: this._usersServiceHealthCheckEndpoint }).then((response) => {
       switch (response._tag) {
         case 'Left':
           return response;

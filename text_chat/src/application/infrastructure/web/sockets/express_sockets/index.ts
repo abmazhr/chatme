@@ -1,12 +1,26 @@
-import * as express from 'express';
+import express from 'express';
 import { createServer, Server } from 'http';
-import * as socketIO from 'socket.io';
+import socketIO from 'socket.io';
 import LoginUserUseCase from '../../../../usecase/user/login';
 import SocketRegistryContainer from '../../entity/sockets_registry';
 import WebSocketsInterface from '../index';
 
 export default class ExpressWebSockets implements WebSocketsInterface {
-  // @ts-ignore
+  // tslint:disable-next-line:variable-name
+  private readonly _restApi: express.Application;
+  // tslint:disable-next-line:variable-name
+  private readonly _socketsApi: socketIO.Server;
+  // tslint:disable-next-line:variable-name
+  private readonly _httpServer: Server;
+
+  constructor({ socketRegistryContainers }: { socketRegistryContainers: [SocketRegistryContainer] }) {
+    this._restApi = express();
+    this._httpServer = createServer(this._restApi);
+    this._socketsApi = socketIO(this._httpServer);
+
+    this.registerSocketEventsAndHandlers({ socketRegistryContainers });
+  }
+
   public static login({ loginUserUseCase }: { loginUserUseCase: LoginUserUseCase }): (...args: any) => any {
     return async (socket: socketIO.Socket) => {
       const username: string = socket.request.headers.username;
@@ -27,27 +41,12 @@ export default class ExpressWebSockets implements WebSocketsInterface {
     };
   }
 
-  // tslint:disable-next-line:variable-name
-  private readonly _restApi: express.Application;
-  // tslint:disable-next-line:variable-name
-  private readonly _socketsApi: socketIO.Server;
-  // tslint:disable-next-line:variable-name
-  private readonly _httpServer: Server;
-
-  constructor({ socketRegistryContainers }: { socketRegistryContainers: [SocketRegistryContainer] }) {
-    this._restApi = express();
-    this._httpServer = createServer(this._restApi);
-    this._socketsApi = socketIO(this._httpServer);
-
-    this.registerSocketEventsAndHandlers({ socketRegistryContainers });
-  }
-
   public registerSocketEventsAndHandlers({
     socketRegistryContainers,
   }: {
     socketRegistryContainers: [SocketRegistryContainer];
   }): ExpressWebSockets {
-    socketRegistryContainers.forEach(container => {
+    socketRegistryContainers.forEach((container) => {
       this._socketsApi.addListener(container.eventName, container.eventHandler);
     });
     return this;

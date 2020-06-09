@@ -1,10 +1,15 @@
+import * as os from 'os';
 import SocketRegistryContainer from './application/infrastructure/web/entity/sockets_registry';
 import AxiosHttpClient from './application/infrastructure/web/http_client/axios';
 import ExpressWebSockets from './application/infrastructure/web/sockets/express_sockets';
 import UsersServiceHealthCheckUseCase from './application/usecase/health_check/users_service';
 import LoginUserUseCase from './application/usecase/user/login';
+import logger from './domain/common/logger';
 
 const httpClient = new AxiosHttpClient();
+const port = parseInt(process.env.PORT);
+const usersServiceHealthCheckEndpoint = process.env.USERS_SERVICE_HEALTH_CHECK_ENDPOINT;
+const usersServiceLoginEndpoint = process.env.USERS_SERVICE_LOGIN_ENDPOINT;
 
 new ExpressWebSockets({
   socketRegistryContainers: [
@@ -14,13 +19,20 @@ new ExpressWebSockets({
           httpClient,
           usersServiceHealthCheckUseCase: new UsersServiceHealthCheckUseCase({
             httpClient,
-            usersServiceHealthCheckEndpoint: 'http://localhost:3000/healthz',
+            usersServiceHealthCheckEndpoint,
           }),
-          usersServiceLoginEndpoint: 'http://localhost:3000/users/login',
+          usersServiceLoginEndpoint,
         }),
       }),
       eventName: 'connection',
     }),
   ],
   // tslint:disable-next-line:no-console
-}).serve({ port: 3001, starterFunc: () => console.log('Listening on port 3001') });
+}).serve({
+  port,
+  starterFunc: () => logger.info(
+    `up and running in ${
+      process.env.NODE_ENV || 'development'
+    } @: ${os.hostname()} on port: ${port}}`,
+  ),
+});

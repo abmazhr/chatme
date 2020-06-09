@@ -8,8 +8,8 @@ export default class AxiosHttpClient implements HttpClientInterface {
   public get({ endpoint, config }: { endpoint: string; config?: any }): Promise<Either<Failure, HttpResponse>> {
     return axios
       .get(endpoint, config)
-      .then(response => right(new HttpResponse({ data: response.data, statusCode: response.status })))
-      .catch(error => left(new Failure({ error })));
+      .then((response) => right(new HttpResponse({ data: response.data, statusCode: response.status })))
+      .catch((error) => left(new Failure({ error })));
   }
 
   public post({
@@ -23,7 +23,7 @@ export default class AxiosHttpClient implements HttpClientInterface {
   }): Promise<Either<Failure, HttpResponse>> {
     return axios
       .post(endpoint, data, config)
-      .then(response => right(new HttpResponse({ data: response.data, statusCode: response.status })))
-      .catch(error => left(new Failure({ error })));
+      .then((response) => right(new HttpResponse({ data: response.data, statusCode: response.status })))
+      .catch((error) => left(new Failure({ error })));
   }
 }

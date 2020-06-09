@@ -35,14 +35,14 @@ export default class LoginUserUseCase implements UseCaseInterface {
     password: string;
   }): Promise<Either<Failure, AccessToken>> {
     return Promise.resolve(
-      this._usersServiceUseCase.execute().then(healthCheckResponse => {
+      this._usersServiceUseCase.execute().then((healthCheckResponse) => {
         switch (healthCheckResponse._tag) {
           case 'Left':
             return healthCheckResponse;
           case 'Right':
             return this._httpClient
               .post({ endpoint: this._usersServiceLoginEndpoint, data: { username, password } })
-              .then(LoginResponse => {
+              .then((LoginResponse) => {
                 switch (LoginResponse._tag) {
                   case 'Left':
                     return LoginResponse;

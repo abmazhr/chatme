@@ -1,4 +1,3 @@
-// tslint:disable-next-line:no-implicit-dependencies
 import * as chai from 'chai';
 import AxiosHttpClient from '../../../../../src/application/infrastructure/web/http_client/axios';
 import UsersServiceHealthCheckUseCase from '../../../../../src/application/usecase/health_check/users_service';
