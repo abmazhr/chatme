@@ -1,0 +1,1 @@
+{"version":3,"file":"sockets_registry.js","sourceRoot":"","sources":["../../../../../src/application/infrastructure/web/entity/sockets_registry.ts"],"names":[],"mappings":";;AAAA,MAAqB,uBAAuB;IAK1C,YAAY,EACV,SAAS,EACT,YAAY,EACZ,MAAM,GAKP;QACC,IAAI,CAAC,SAAS,GAAG,SAAS,CAAC;QAC3B,IAAI,CAAC,YAAY,GAAG,YAAY,CAAC;QACjC,IAAI,CAAC,MAAM,GAAG,MAAM,CAAC;IACvB,CAAC;CACF;AAlBD,0CAkBC"}
