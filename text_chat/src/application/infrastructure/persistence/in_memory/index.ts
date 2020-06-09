@@ -15,7 +15,10 @@ export default class InMemoryDatabase implements PersistenceInterface {
       : left(new Failure({ error: `There is no access-token for user ${username}` }));
   }
 
-  public persistAccessToken({ username, accessToken }: {
+  public persistAccessToken({
+    username,
+    accessToken,
+  }: {
     username: string;
     accessToken: AccessToken;
   }): Either<Failure, Success> {

@@ -11,9 +11,8 @@ describe('Valid persist of an access-token', () => {
   it('should return a Right', async () => {
     const username = 'test';
     const accessToken = { token: 'valid_token_for_now' };
-    await persistUseCase.execute({ username, accessToken })
-      .then((response) => {
-        expect(response._tag).to.eq('Right');
-      });
+    await persistUseCase.execute({ username, accessToken }).then(response => {
+      expect(response._tag).to.eq('Right');
+    });
   });
 });
