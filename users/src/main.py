@@ -1,11 +1,11 @@
 import os
 import sys
 
-from application.infrastructure.web.schema.json.user.login_user import login_user
-from application.usecase.user.add_access_token import AddAccessTokenUseCase
-from application.usecase.user.fetch_access_token import FetchAccessTokenUseCase
-
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+
+from src.application.infrastructure.web.schema.json.user.login_user import login_user
+from src.application.usecase.user.add_access_token import AddAccessTokenUseCase
+from src.application.usecase.user.fetch_access_token import FetchAccessTokenUseCase
 
 from src.application.entity.service import Service
 from src.application.infrastructure.persistence.in_memory import InMemoryDatabase
