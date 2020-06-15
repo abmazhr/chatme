@@ -11,10 +11,19 @@ prepare-env-locally: ## Install the service's dependencies
 
 
 run-tests-native-locally: prepare-env-locally ## Running the service's tests natively locally
-	@echo -e "\e[1;34mrunning tests native locally ...\e[0m" && \
+	@echo -e "\e[1;34mRunning tests native locally ...\e[0m" && \
 		yarn run test
 
 run-server-native-locally: prepare-env-locally ## Running the service's server natively locally
-	@echo -e "\e[1;34mrunning server native locally ...\e[0m" && \
+	@echo -e "\e[1;34mRunning server native locally ...\e[0m" && \
 		echo -e "\e[1;33mTo exit press CTRL+C ...\e[0m" && \
 		yarn run start
+
+run-server-on-docker-locally: ## Running the service's server on docker locally
+	@echo -e "\e[1;34mRunning server on docker locally ...\e[0m" && \
+		echo -e "\e[1;33mTo exit press CTRL+C ...\e[0m" && \
+		docker-compose up --build -d --scale web-socket-server=5 nginx
+
+stop-server-on-docker-locally: ## Stopping the service's server on docker locally
+	@echo -e "\e[1;34mStopping server on docker locally ...\e[0m" && \
+		docker-compose down
