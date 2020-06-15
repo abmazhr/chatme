@@ -1,0 +1,28 @@
+version: '3'
+services:
+  web-socket-server:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    hostname: web-socket-server
+    expose:
+      - 3001
+    networks:
+      - web
+
+  nginx:
+    image: "nginx:stable-alpine"
+    ports:
+      - "80:80"
+    links:
+      - web-socket-server
+    volumes:
+      - ./conf.d:/etc/nginx/conf.d
+    depends_on:
+      - web-socket-server
+    networks:
+      - web
+
+networks:
+  web:
+    driver: bridge
