@@ -3,6 +3,7 @@ import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
+from src.domain.entity.user import create_user, UserRole
 from src.application.infrastructure.web.schema.json.user.login_user import login_user
 from src.application.usecase.user.add_access_token import AddAccessTokenUseCase
 from src.application.usecase.user.fetch_access_token import FetchAccessTokenUseCase
@@ -20,6 +21,20 @@ from src.application.usecase.user.fetch_user import FetchUserUseCase
 from src.application.usecase.user.update_user import UpdateUserUseCase
 
 db = InMemoryDatabase(config=None)
+db.persist_user(user=create_user(
+    name="test1",
+    age=26,
+    password="Str0ngPassword",
+    email="test1@valid.com",
+    role=UserRole.USER
+))
+db.persist_user(user=create_user(
+    name="test2",
+    age=26,
+    password="Str0ngPassword",
+    email="test1@valid.com",
+    role=UserRole.USER
+))
 
 StarletteRestApi(
     config=None,
