@@ -3,7 +3,8 @@ A couple of distributed services making up a simple chat app just to demonstrate
 
 # SERVICES
 The current view of services will contain
-- Users service.
+- Users service [Python].
+- Text-Chat service [TypeScript & Node.js].
 
 # Current Architecture State
 
