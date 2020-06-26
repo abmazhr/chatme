@@ -7,6 +7,7 @@ Here it's the service which is responsible for any user related actions which ar
 **`System Architecture`**
 
 The architecture of the service is done somehow close to the [clean_architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) by uncle bob.
+
 ![clean_architecture](clean_architecture_diagram.svg)
 
 **`REST-API Diagram`**
