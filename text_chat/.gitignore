@@ -11,3 +11,4 @@ lib_test
 yarn.lock
 package-lock.json
 !/dist/
+*.odg
